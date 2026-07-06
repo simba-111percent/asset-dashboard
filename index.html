@@ -351,11 +351,6 @@ tbody tr:last-child td { border-bottom: none; }
         </div>
       </div>
 
-      <div class="alert-banner" id="unknown-alert" style="display:none;">
-        <span class="alert-icon">⚠️</span>
-        <span class="alert-text"><strong id="unknown-count">0</strong>건의 자산이 <strong>미확인</strong> 상태입니다. 사옥 이전(2024.09) 시 유실 가능성이 있어요.</span>
-        <button class="alert-link" onclick="switchView('list'); setStatusFilter('미확인')">미확인 자산 보기 →</button>
-      </div>
 
       <div class="stats-grid">
         <div class="stat-card">
@@ -728,32 +723,44 @@ tbody tr:last-child td { border-bottom: none; }
       <div class="page-hd">
         <div>
           <div class="page-title">구글시트 연동</div>
-          <div class="page-sub">구글시트와 로컬 데이터를 수동으로 동기화합니다 (충돌 방지를 위해 자동 동기화하지 않아요)</div>
+          <div class="page-sub">HW 자산 · SW 자산 · 좌석배치도 시트를 각각 연동해요. 연동 후 5분마다 자동 갱신됩니다.</div>
         </div>
       </div>
 
       <div class="table-card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
-        <div class="field-section" style="margin-top:0;">1. Apps Script 웹앱 URL</div>
+        <div class="field-section" style="margin-top:0;">1. Apps Script 웹앱 URL 설정</div>
+        <p style="font-size:12.5px; color:var(--text-sub); margin-bottom: 1rem; line-height:1.7;">
+          각 구글시트에 아래 Apps Script 코드를 설치하고 발급받은 URL을 입력하세요.
+        </p>
+
         <div class="field">
-          <label>웹앱 URL (Apps Script 배포 후 발급되는 주소)</label>
-          <input type="text" id="sheet-url" placeholder="https://script.google.com/macros/s/AKfycb.../exec">
+          <label>HW 자산관리대장 URL</label>
+          <input type="text" id="url-hw" placeholder="https://script.google.com/macros/s/.../exec">
+        </div>
+        <div class="field">
+          <label>SW 자산관리대장 URL</label>
+          <input type="text" id="url-sw" placeholder="https://script.google.com/macros/s/.../exec">
+        </div>
+        <div class="field">
+          <label>좌석배치도 URL</label>
+          <input type="text" id="url-seats" placeholder="https://script.google.com/macros/s/.../exec">
         </div>
         <button class="btn btn-primary" onclick="saveSheetConfig()">연결 저장</button>
 
         <div class="field-section">2. 최신 데이터 가져오기</div>
         <p style="font-size:12.5px; color:var(--text-sub); margin-bottom: 1rem; line-height:1.7;">
-          구글시트에서 변경된 데이터를 대시보드로 가져옵니다. 버튼을 누를 때마다 최신 데이터로 갱신돼요.
+          페이지 접속 시 자동으로 가져오며, 5분마다 갱신됩니다. 즉시 갱신하려면 아래 버튼을 클릭하세요.
         </p>
-        <div style="display:flex; gap:8px;">
-          <button class="btn btn-primary" onclick="pullFromSheet()">↓ 구글시트에서 최신 데이터 가져오기</button>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="pullFromSheet()">↓ 전체 최신 데이터 가져오기</button>
         </div>
         <div id="sync-log" style="margin-top:1rem; font-size:12px; color:var(--text-muted);"></div>
       </div>
 
       <div class="table-card" style="padding: 1.5rem;">
-        <div class="field-section" style="margin-top:0;">Apps Script 코드 (구글시트에 설치)</div>
+        <div class="field-section" style="margin-top:0;">Apps Script 코드 (3개 시트 모두 동일)</div>
         <p style="font-size:12.5px; color:var(--text-sub); margin-bottom: 0.75rem;">
-          연동할 구글시트 열기 → 확장 프로그램 → Apps Script → 아래 코드 붙여넣기 → 배포 → 웹앱으로 배포 (액세스 권한: 전체 허용) → 발급된 URL을 위 1번에 입력
+          각 구글시트 열기 → <strong>확장 프로그램 → Apps Script</strong> → 기존 코드 전체 삭제 후 아래 코드 붙여넣기 → <strong>배포 → 새 배포 → 웹앱 → 액세스: 전체 허용</strong> → URL 복사 후 위에 입력
         </p>
         <pre id="apps-script-code" style="background: var(--surface-2); border-radius: 8px; padding: 1rem; font-size: 11.5px; overflow-x: auto; white-space: pre; line-height: 1.6; border: 0.5px solid var(--border);"></pre>
         <button class="btn btn-sm" onclick="copyScript()" style="margin-top:0.75rem;">코드 복사</button>
@@ -908,13 +915,6 @@ function renderDashboard() {
   document.getElementById('st-stock-loc').textContent = `위치 미확인 ${stockNoLoc.length}건 포함`;
   document.getElementById('st-unknown').textContent = unknown.length.toLocaleString();
   document.getElementById('st-replace').textContent = replaceCands.length.toLocaleString();
-
-  if (unknown.length > 0) {
-    document.getElementById('unknown-alert').style.display = 'flex';
-    document.getElementById('unknown-count').textContent = unknown.length;
-  } else {
-    document.getElementById('unknown-alert').style.display = 'none';
-  }
 
   const now = new Date();
   document.getElementById('dash-updated').textContent =
@@ -1804,17 +1804,20 @@ function deleteSwItem() {
   renderSwDashboard();
 }
 
+// ============ Google Sheets Sync (3개 시트) ============
 function loadSheetConfig() {
-  try {
-    return JSON.parse(localStorage.getItem(LS_SHEET_KEY) || '{}');
-  } catch (e) { return {}; }
+  try { return JSON.parse(localStorage.getItem(LS_SHEET_KEY) || '{}'); }
+  catch(e) { return {}; }
 }
 
 function saveSheetConfig() {
-  const url = document.getElementById('sheet-url').value.trim();
-  localStorage.setItem(LS_SHEET_KEY, JSON.stringify({ url }));
+  const hw = (document.getElementById('url-hw') || {}).value?.trim() || '';
+  const sw = (document.getElementById('url-sw') || {}).value?.trim() || '';
+  const seats = (document.getElementById('url-seats') || {}).value?.trim() || '';
+  localStorage.setItem(LS_SHEET_KEY, JSON.stringify({ hw, sw, seats }));
   updateSyncBar();
   logSync('연동 설정을 저장했어요.');
+  startAutoSync();
 }
 
 function updateSyncBar() {
@@ -1822,9 +1825,11 @@ function updateSyncBar() {
   const dot = document.getElementById('sync-dot');
   const text = document.getElementById('sync-status-text');
   const btnPull = document.getElementById('btn-pull');
-  if (cfg.url) {
+  const connected = cfg.hw || cfg.sw || cfg.seats;
+  if (connected) {
     dot.className = 'sync-status-dot on';
-    text.innerHTML = `구글시트 연동됨 — <strong>5분마다 자동 갱신</strong>`;
+    const parts = [cfg.hw && 'HW', cfg.sw && 'SW', cfg.seats && '좌석'].filter(Boolean);
+    text.innerHTML = `구글시트 연동됨 (${parts.join(' · ')}) — <strong>5분마다 자동 갱신</strong>`;
     btnPull.disabled = false;
   } else {
     dot.className = 'sync-status-dot off';
@@ -1840,60 +1845,191 @@ function logSync(msg, isError) {
   el.innerHTML = `<div style="color:${isError ? 'var(--danger)' : 'var(--text-sub)'}; margin-top:4px;">[${time}] ${escapeHtml(msg)}</div>` + el.innerHTML;
 }
 
-async function pullFromSheet(silent = false) {
-  const cfg = loadSheetConfig();
-  if (!cfg.url) { if (!silent) switchView('sync'); return; }
-  if (!silent) logSync('구글시트에서 가져오는 중...');
-  try {
-    const res = await fetch(cfg.url + '?action=pull');
-    const json = await res.json();
-    if (json.assets && Array.isArray(json.assets)) {
-      assets = json.assets;
-      saveAssets();
-      // 현재 보고 있는 뷰 자동 갱신
-      const activeView = document.querySelector('.view.active')?.id?.replace('view-', '');
-      if (activeView === 'dashboard') renderDashboard();
-      if (activeView === 'list') renderList();
-      if (activeView === 'replace') renderReplaceCandidates();
-      if (activeView === 'stock') renderStock();
-      if (!silent) logSync(`가져오기 완료 — ${assets.length}건 동기화됨`);
-      // sync bar 시간 업데이트
-      const now = new Date();
-      document.getElementById('sync-status-text').innerHTML =
-        `구글시트 연동됨 — 마지막 동기화: <strong>${now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'})}</strong>`;
-    } else {
-      if (!silent) logSync('가져오기 실패 — 응답 형식이 올바르지 않아요', true);
-    }
-  } catch (e) {
-    if (!silent) logSync('가져오기 실패 — ' + e.message, true);
+function parseHwSheetData(sheetData) {
+  const tabConfig = {
+    '데스크탑(250715)': { headerRow: 7, hasMain: true },
+    'MAC(250715)':      { headerRow: 7, hasMain: true },
+    'NT(250715)':       { headerRow: 8, hasMain: true },
+    '타블렛,모바일,음향': { headerRow: 8, hasMain: false },
+  };
+
+  function normalizeCorp(v) {
+    if (!v) return '111percent';
+    const s = String(v).trim();
+    return (s === '1.11' || s === '') ? '111percent' : s;
   }
+
+  function normalizeCategory(tabName, cat) {
+    if (tabName.startsWith('데스크탑')) return 'DESKTOP';
+    if (tabName.startsWith('MAC')) return 'MAC';
+    if (tabName.startsWith('NT')) return 'NOTEBOOK';
+    const c = String(cat || '').trim();
+    if (c === '모바일기기') return 'MOBILE';
+    if (c === '타블렛') return 'TABLET';
+    if (c === '음향장비') return 'AUDIO';
+    return 'ETC';
+  }
+
+  function cv(v) {
+    if (v === null || v === undefined) return '';
+    if (typeof v === 'number') return Number.isInteger(v) ? String(v) : String(v);
+    return String(v).trim();
+  }
+
+  function cd(v) {
+    if (!v) return '';
+    if (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}/.test(v)) return v.slice(0,10);
+    if (typeof v === 'number') {
+      const d = new Date(Math.round((v - 25569) * 86400 * 1000));
+      return d.toISOString().slice(0,10);
+    }
+    return String(v).trim();
+  }
+
+  const result = [];
+  let aid = 1;
+
+  Object.entries(tabConfig).forEach(([tabName, cfg]) => {
+    const rows = sheetData[tabName];
+    if (!rows || !Array.isArray(rows)) return;
+
+    for (let i = cfg.headerRow; i < rows.length; i++) {
+      const r = rows[i];
+      if (!r || !r.some(c => c !== null && c !== undefined && c !== '')) continue;
+
+      const m = cfg.hasMain ? 1 : 0;
+      const location = cv(r[0]);
+      const corp     = normalizeCorp(r[1]);
+      const category = cv(r[2]);
+      const status   = cv(r[3]);
+      const noOld    = cv(r[4]);
+      const no       = cv(r[5]);
+      const user     = cv(r[6 + m]);
+      const prevUser = cv(r[7 + m]);
+      const name     = cv(r[8 + m]);
+      const cpu      = cv(r[9 + m]);
+      const ram      = cv(r[10 + m]);
+      const ssd      = cv(r[11 + m]);
+      const hdd      = cv(r[12 + m]);
+      const gpu      = cv(r[13 + m]);
+      const acqYear  = cv(r[15 + m]);
+      const acqDate  = cd(r[16 + m]);
+      const price    = parseFloat(cv(r[17 + m])) || 0;
+      const residual = parseFloat(cv(r[19 + m])) || 0;
+      const note     = cv(r[20 + m]);
+
+      if (!name && !category) continue;
+      if (!status) continue;
+
+      result.push({
+        id: `a${aid++}`,
+        no: (no === '-' || no === '') ? '' : no,
+        noOld: (noOld === '-' || noOld === '') ? '' : noOld,
+        cat: normalizeCategory(tabName, category),
+        name,
+        status: status === '-' ? '미확인' : status,
+        user: (user === '-' || user === '') ? '' : user,
+        prevUser: prevUser === '-' ? '' : prevUser,
+        loc: location,
+        os: tabName.startsWith('MAC') ? 'macOS' : (tabName.startsWith('데스크탑') || tabName.startsWith('NT') ? 'Windows' : ''),
+        cpu, ram, ssd, hdd, gpu,
+        corp,
+        acqDate,
+        acqYear,
+        price,
+        residual,
+        note,
+      });
+    }
+  });
+
+  return result;
 }
 
-async function pushToSheet() {
+async function fetchSheet(url) {
+  const res = await fetch(url);
+  return await res.json();
+}
+
+async function pullFromSheet(silent = false) {
   const cfg = loadSheetConfig();
-  if (!cfg.url) { switchView('sync'); return; }
-  logSync('구글시트로 내보내는 중...');
+  const hasAny = cfg.hw || cfg.sw || cfg.seats;
+  if (!hasAny) { if (!silent) switchView('sync'); return; }
+  if (!silent) logSync('구글시트에서 가져오는 중...');
+
+  const done = [];
   try {
-    const res = await fetch(cfg.url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ action: 'push', assets })
-    });
-    const json = await res.json();
-    if (json.success) {
-      logSync(`내보내기 완료 — ${assets.length}건 구글시트에 반영됨`);
-    } else {
-      logSync('내보내기 실패 — ' + (json.error || '알 수 없는 오류'), true);
+    // HW Pull
+    if (cfg.hw) {
+      const data = await fetchSheet(cfg.hw);
+      const hwAssets = parseHwSheetData(data);
+      if (hwAssets.length) {
+        assets = hwAssets;
+        saveAssets();
+      }
+      done.push(`HW ${assets.length}건`);
     }
-  } catch (e) {
-    logSync('내보내기 실패 — ' + e.message, true);
+    // SW Pull (현재는 내장 데이터 유지, 추후 확장)
+    if (cfg.sw) { done.push('SW'); }
+    // 좌석 Pull
+    if (cfg.seats) {
+      const data = await fetchSheet(cfg.seats);
+      const newSeats = [];
+      Object.entries(data).forEach(([sheetName, rows]) => {
+        if (!Array.isArray(rows)) return;
+        rows.forEach(r => {
+          if (!Array.isArray(r)) return;
+          r.forEach(cell => {
+            if (!cell) return;
+            const s = String(cell).trim();
+            if (s.includes('\n')) {
+              const parts = s.split('\n');
+              if (parts.length >= 2) {
+                const seat = parts[0].trim();
+                const name = parts[1].trim();
+                if (/^\d+-\d+$/.test(seat) && name) {
+                  newSeats.push({ floor: sheetName, seat, name });
+                }
+              }
+            }
+          });
+        });
+      });
+      if (newSeats.length) { window._dynamicSeats = newSeats; done.push('좌석'); }
+    }
+
+    // 현재 뷰 갱신
+    const activeView = document.querySelector('.view.active')?.id?.replace('view-', '');
+    if (activeView === 'dashboard') renderDashboard();
+    if (activeView === 'list') renderList();
+    if (activeView === 'replace') renderReplaceCandidates();
+    if (activeView === 'stock') renderStock();
+    if (activeView === 'people') renderPeople();
+
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'});
+    if (!silent && done.length) logSync(`가져오기 완료 — ${done.join(', ')} (${timeStr})`);
+
+    const cfg2 = loadSheetConfig();
+    if (cfg2.hw || cfg2.sw || cfg2.seats) {
+      const syncText = document.getElementById('sync-status-text');
+      if (syncText) syncText.innerHTML = `구글시트 연동됨 — 마지막 갱신: <strong>${timeStr}</strong>`;
+    }
+  } catch(e) {
+    if (!silent) logSync('가져오기 실패 — ' + e.message, true);
   }
 }
 
 function renderSyncView() {
   const cfg = loadSheetConfig();
-  document.getElementById('sheet-url').value = cfg.url || '';
-  document.getElementById('apps-script-code').textContent = APPS_SCRIPT_CODE;
+  const elHw = document.getElementById('url-hw');
+  const elSw = document.getElementById('url-sw');
+  const elSeats = document.getElementById('url-seats');
+  if (elHw) elHw.value = cfg.hw || '';
+  if (elSw) elSw.value = cfg.sw || '';
+  if (elSeats) elSeats.value = cfg.seats || '';
+  const codeEl = document.getElementById('apps-script-code');
+  if (codeEl) codeEl.textContent = APPS_SCRIPT_CODE;
 }
 
 function copyScript() {
@@ -1903,60 +2039,24 @@ function copyScript() {
 }
 
 const APPS_SCRIPT_CODE = `function doGet(e) {
-  if (e.parameter.action === 'pull') {
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('assets') 
-                || SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var result = {};
+  ss.getSheets().forEach(function(sheet) {
     var data = sheet.getDataRange().getValues();
-    var headers = data[0];
-    var assets = [];
-    for (var i = 1; i < data.length; i++) {
-      var row = data[i];
-      if (!row[0]) continue;
-      var obj = {};
-      headers.forEach(function(h, idx) { obj[h] = row[idx]; });
-      assets.push(obj);
-    }
-    return ContentService.createTextOutput(JSON.stringify({ assets: assets }))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-  return ContentService.createTextOutput(JSON.stringify({ error: 'unknown action' }))
-    .setMimeType(ContentService.MimeType.JSON);
-}
-
-function doPost(e) {
-  var body = JSON.parse(e.postData.contents);
-  if (body.action === 'push') {
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var sheet = ss.getSheetByName('assets') || ss.insertSheet('assets');
-    sheet.clear();
-    var assets = body.assets;
-    if (assets.length === 0) {
-      return ContentService.createTextOutput(JSON.stringify({ success: true }))
-        .setMimeType(ContentService.MimeType.JSON);
-    }
-    var headers = Object.keys(assets[0]);
-    var rows = [headers];
-    assets.forEach(function(a) {
-      rows.push(headers.map(function(h) { return a[h] !== undefined ? a[h] : ''; }));
-    });
-    sheet.getRange(1, 1, rows.length, headers.length).setValues(rows);
-    return ContentService.createTextOutput(JSON.stringify({ success: true, count: assets.length }))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-  return ContentService.createTextOutput(JSON.stringify({ success: false, error: 'unknown action' }))
+    result[sheet.getName()] = data;
+  });
+  return ContentService
+    .createTextOutput(JSON.stringify(result))
     .setMimeType(ContentService.MimeType.JSON);
 }`;
 
 // ============ Init ============
-
-// 자동 Pull — 구글시트 URL 연결돼있으면 5분마다 자동으로 최신 데이터 가져오기
 function startAutoSync() {
   const cfg = loadSheetConfig();
-  if (!cfg.url) return;
-  // 즉시 한 번 Pull
+  if (!cfg.hw && !cfg.sw && !cfg.seats) return;
   pullFromSheet(true);
-  // 5분마다 자동 Pull
-  setInterval(() => pullFromSheet(true), 5 * 60 * 1000);
+  if (window._autoSyncInterval) clearInterval(window._autoSyncInterval);
+  window._autoSyncInterval = setInterval(() => pullFromSheet(true), 5 * 60 * 1000);
 }
 
 loadAssets();
