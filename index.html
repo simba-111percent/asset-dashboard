@@ -385,20 +385,20 @@ tbody tr:last-child td { border-bottom: none; }
           <div class="chart-wrap"><canvas id="chart-category"></canvas></div>
         </div>
         <div class="chart-card">
-          <div class="chart-title">상태별 현황</div>
-          <div class="chart-wrap"><canvas id="chart-status"></canvas></div>
-        </div>
-        <div class="chart-card">
           <div class="chart-title">OS 분포</div>
           <div class="chart-wrap"><canvas id="chart-os"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">RAM 스펙 분포 (사용중)</div>
+          <div class="chart-wrap"><canvas id="chart-ram"></canvas></div>
         </div>
         <div class="chart-card wide">
           <div class="chart-title">연도별 취득 추이</div>
           <div class="chart-wrap tall"><canvas id="chart-yearly"></canvas></div>
         </div>
         <div class="chart-card">
-          <div class="chart-title">법인별 분포</div>
-          <div class="chart-wrap"><canvas id="chart-corp"></canvas></div>
+          <div class="chart-title">사용기간 분포 (사용중)</div>
+          <div class="chart-wrap"><canvas id="chart-age"></canvas></div>
         </div>
       </div>
     </section>
@@ -566,23 +566,28 @@ tbody tr:last-child td { border-bottom: none; }
         <div class="stat-card"><div class="stat-label">전체 구독</div><div class="stat-value" id="sw-st-total">—</div></div>
         <div class="stat-card"><div class="stat-label">연간 구독</div><div class="stat-value info" id="sw-st-annual">—</div></div>
         <div class="stat-card"><div class="stat-label">월간 구독</div><div class="stat-value accent" id="sw-st-monthly">—</div></div>
-        <div class="stat-card"><div class="stat-label">D-30 만료 임박</div><div class="stat-value warn" id="sw-st-soon">—</div></div>
-        <div class="stat-card"><div class="stat-label">만료됨</div><div class="stat-value danger" id="sw-st-expired">—</div></div>
+        <div class="stat-card"><div class="stat-label">D-10 만료 임박</div><div class="stat-value warn" id="sw-st-soon">—</div></div>
+        <div class="stat-card"><div class="stat-label">연간 비용 (원화)</div><div class="stat-value success" id="sw-st-krw" style="font-size:16px;">—</div></div>
+        <div class="stat-card"><div class="stat-label">연간 비용 (달러)</div><div class="stat-value info" id="sw-st-usd" style="font-size:16px;">—</div></div>
       </div>
 
       <div class="charts-grid" style="grid-template-columns: repeat(2,1fr);">
+        <div class="chart-card wide" style="grid-column:span 2;">
+          <div class="chart-title">월별 만료 예정 건수</div>
+          <div class="chart-wrap tall"><canvas id="sw-chart-expire"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">연간 비용 현황</div>
+          <div class="chart-wrap"><canvas id="sw-chart-cost"></canvas></div>
+        </div>
         <div class="chart-card">
           <div class="chart-title">알림 유형별 분포</div>
           <div class="chart-wrap"><canvas id="sw-chart-alert"></canvas></div>
         </div>
-        <div class="chart-card">
-          <div class="chart-title">결제 형태별 분포</div>
-          <div class="chart-wrap"><canvas id="sw-chart-form"></canvas></div>
-        </div>
       </div>
 
       <!-- D-30 임박 목록 -->
-      <div class="chart-card" style="margin-top:0;">
+      <div class="chart-card" style="margin-top:12px;">
         <div class="chart-title">⚠ 만료 임박 (D-30 이내)</div>
         <div id="sw-soon-list" style="margin-top:0.5rem;"></div>
       </div>
@@ -940,7 +945,9 @@ function countBy(arr, fn) {
 }
 
 function renderCharts(active) {
-  // Category
+  const used = active.filter(a => a.status === '사용중');
+
+  // 유형별 분포 (도넛)
   destroyChart('category');
   const catCount = countBy(active, a => a.cat);
   charts.category = new Chart(document.getElementById('chart-category'), {
@@ -952,37 +959,46 @@ function renderCharts(active) {
     options: { plugins: { legend: { position: 'right', labels: { font: { size: 11 }, boxWidth: 10, padding: 8 } } }, maintainAspectRatio: false }
   });
 
-  // Status
-  destroyChart('status');
-  const statusCount = countBy(active, a => a.status);
-  charts.status = new Chart(document.getElementById('chart-status'), {
-    type: 'doughnut',
-    data: {
-      labels: Object.keys(statusCount),
-      datasets: [{ data: Object.values(statusCount), backgroundColor: ['#2f6d4a','#2f5276','#9a5b14','#a13d2f'], borderWidth: 0 }]
-    },
-    options: { plugins: { legend: { position: 'right', labels: { font: { size: 11 }, boxWidth: 10, padding: 8 } } }, maintainAspectRatio: false }
-  });
-
-  // OS
+  // OS 분포 (도넛)
   destroyChart('os');
-  const withOs = active.filter(a => a.os);
-  const osCount = countBy(withOs, a => a.os);
+  const osCount = countBy(active.filter(a => a.os), a => a.os);
   charts.os = new Chart(document.getElementById('chart-os'), {
     type: 'doughnut',
     data: {
       labels: Object.keys(osCount),
-      datasets: [{ data: Object.values(osCount), backgroundColor: ['#2f5276', '#6b665c'], borderWidth: 0 }]
+      datasets: [{ data: Object.values(osCount), backgroundColor: ['#2f5276', '#2f5d50'], borderWidth: 0 }]
     },
     options: { plugins: { legend: { position: 'right', labels: { font: { size: 11 }, boxWidth: 10, padding: 8 } } }, maintainAspectRatio: false }
   });
 
-  // Yearly trend
+  // RAM 스펙 분포 (사용중, 막대)
+  destroyChart('ram');
+  const ramRaw = {};
+  used.forEach(a => {
+    if (!a.ram) return;
+    const r = String(a.ram).replace(/GB|gb/g,'').trim();
+    if (r && !isNaN(r)) ramRaw[r + 'GB'] = (ramRaw[r + 'GB'] || 0) + 1;
+  });
+  const ramSorted = Object.entries(ramRaw).sort((a,b) => parseInt(a[0]) - parseInt(b[0]));
+  charts.ram = new Chart(document.getElementById('chart-ram'), {
+    type: 'bar',
+    data: {
+      labels: ramSorted.map(e => e[0]),
+      datasets: [{ data: ramSorted.map(e => e[1]), backgroundColor: '#2f5d50', borderRadius: 4 }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      maintainAspectRatio: false,
+      scales: { y: { beginAtZero: true, ticks: { font: { size: 11 }, stepSize: 1 } }, x: { ticks: { font: { size: 11 } } } }
+    }
+  });
+
+  // 연도별 취득 추이 (막대)
   destroyChart('yearly');
   const yearCount = {};
   active.forEach(a => {
     const y = a.acqYear || (a.acqDate ? a.acqDate.slice(0,4) : null);
-    if (y) yearCount[y] = (yearCount[y] || 0) + 1;
+    if (y && y !== '-') yearCount[y] = (yearCount[y] || 0) + 1;
   });
   const years = Object.keys(yearCount).sort();
   charts.yearly = new Chart(document.getElementById('chart-yearly'), {
@@ -998,14 +1014,22 @@ function renderCharts(active) {
     }
   });
 
-  // Corp
-  destroyChart('corp');
-  const corpCount = countBy(active, a => a.corp);
-  charts.corp = new Chart(document.getElementById('chart-corp'), {
+  // 사용기간 분포 (사용중, 도넛)
+  destroyChart('age');
+  const ageBuckets = { '1년 미만': 0, '1~3년': 0, '3~5년': 0, '5년 초과': 0, '불명': 0 };
+  used.forEach(a => {
+    const y = yearsSince(a.acqDate);
+    if (y === null) ageBuckets['불명']++;
+    else if (y < 1) ageBuckets['1년 미만']++;
+    else if (y < 3) ageBuckets['1~3년']++;
+    else if (y < 5) ageBuckets['3~5년']++;
+    else ageBuckets['5년 초과']++;
+  });
+  charts.age = new Chart(document.getElementById('chart-age'), {
     type: 'doughnut',
     data: {
-      labels: Object.keys(corpCount),
-      datasets: [{ data: Object.values(corpCount), backgroundColor: PALETTE, borderWidth: 0 }]
+      labels: Object.keys(ageBuckets),
+      datasets: [{ data: Object.values(ageBuckets), backgroundColor: ['#2f6d4a','#2f5276','#9a5b14','#a13d2f','#9d978b'], borderWidth: 0 }]
     },
     options: { plugins: { legend: { position: 'right', labels: { font: { size: 11 }, boxWidth: 10, padding: 8 } } }, maintainAspectRatio: false }
   });
@@ -1490,22 +1514,90 @@ function renderSwDashboard() {
   const soon = swList.filter(s => { const d = daysUntil(getEffectiveExpire(s)); return d !== null && d >= 0 && d <= 10; });
   const expired = swList.filter(s => { const d = daysUntil(getEffectiveExpire(s)); return d !== null && d < 0; });
 
+  // 비용 합계
+  const krwTotal = active.filter(s => s.currency === 'KRW' && s.priceRaw).reduce((sum, s) => sum + (s.priceRaw || 0), 0);
+  const usdTotal = active.filter(s => s.currency === 'USD' && s.priceRaw).reduce((sum, s) => sum + (s.priceRaw || 0), 0);
+
   document.getElementById('sw-st-total').textContent = active.length;
   document.getElementById('sw-st-annual').textContent = active.filter(s => s.form === 'Annual').length;
-  document.getElementById('sw-st-monthly').textContent = active.filter(s => s.form === 'Monthly').length;
+  document.getElementById('sw-st-monthly').textContent = active.filter(s => s.form === 'Monthly' || s.monthlyEnd || s.monthlyCalc).length;
   document.getElementById('sw-st-soon').textContent = soon.length;
-  document.getElementById('sw-st-expired').textContent = expired.length;
+  document.getElementById('sw-st-krw').textContent = Math.round(krwTotal).toLocaleString('ko-KR') + '원';
+  document.getElementById('sw-st-usd').textContent = '$' + usdTotal.toLocaleString('en-US', {minimumFractionDigits:0, maximumFractionDigits:0});
 
   const now = new Date();
   document.getElementById('sw-dash-updated').textContent =
     now.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' }) + ' ' +
     now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }) + ' 기준 · ' + active.length + '건';
 
-  if (charts['sw-alert']) { charts['sw-alert'].destroy(); }
-  const alertCount = { '개인 알림': 0, '총무 알림': 0, '퇴사시 해지 필수': 0 };
+  // 월별 만료 예정 (막대)
+  if (charts['sw-expire']) { charts['sw-expire'].destroy(); }
+  const expireMonths = {};
   active.forEach(s => {
-    if (s.alertType === 'personal') alertCount['개인 알림']++;
-    else if (s.alertType === 'admin_critical') alertCount['퇴사시 해지 필수']++;
+    const d = s.expireDate || '';
+    if (d && d.length >= 7) {
+      const ym = d.slice(0,7);
+      expireMonths[ym] = (expireMonths[ym] || 0) + 1;
+    }
+  });
+  const sortedMonths = Object.keys(expireMonths).sort().filter(m => m >= now.toISOString().slice(0,7));
+  const monthLabels = sortedMonths.map(m => {
+    const [y, mo] = m.split('-');
+    return `${y}.${mo}`;
+  });
+  const EXPIRE_WARN = '#a13d2f'; // 당월 경고색
+  const thisMonth = now.toISOString().slice(0,7);
+  charts['sw-expire'] = new Chart(document.getElementById('sw-chart-expire'), {
+    type: 'bar',
+    data: {
+      labels: monthLabels,
+      datasets: [{
+        data: sortedMonths.map(m => expireMonths[m]),
+        backgroundColor: sortedMonths.map(m => m === thisMonth ? EXPIRE_WARN : '#2f5d50'),
+        borderRadius: 4
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.raw}건` } } },
+      maintainAspectRatio: false,
+      scales: { y: { beginAtZero: true, ticks: { font: { size: 11 }, stepSize: 5 } }, x: { ticks: { font: { size: 11 } } } }
+    }
+  });
+
+  // 연간 비용 현황 (KRW/USD 가로 막대)
+  if (charts['sw-cost']) { charts['sw-cost'].destroy(); }
+  // 탭별 비용
+  const tabCostKrw = {};
+  const tabCostUsd = {};
+  active.forEach(s => {
+    if (!s.priceRaw) return;
+    if (s.currency === 'KRW') tabCostKrw[s.tab] = (tabCostKrw[s.tab] || 0) + s.priceRaw;
+    else tabCostUsd[s.tab] = (tabCostUsd[s.tab] || 0) + s.priceRaw;
+  });
+  const costTabs = [...new Set([...Object.keys(tabCostKrw), ...Object.keys(tabCostUsd)])];
+  charts['sw-cost'] = new Chart(document.getElementById('sw-chart-cost'), {
+    type: 'bar',
+    data: {
+      labels: costTabs,
+      datasets: [
+        { label: '원화(만원)', data: costTabs.map(t => Math.round((tabCostKrw[t]||0)/10000)), backgroundColor: '#2f5d50', borderRadius: 4 },
+        { label: 'USD', data: costTabs.map(t => Math.round(tabCostUsd[t]||0)), backgroundColor: '#2f5276', borderRadius: 4 },
+      ]
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: { legend: { position: 'top', labels: { font: { size: 11 }, boxWidth: 10 } } },
+      maintainAspectRatio: false,
+      scales: { x: { beginAtZero: true, ticks: { font: { size: 10 } } }, y: { ticks: { font: { size: 11 } } } }
+    }
+  });
+
+  // 알림 유형별 도넛
+  if (charts['sw-alert']) { charts['sw-alert'].destroy(); }
+  const alertCount = { '개인 알림': 0, '총무 알림': 0, '퇴사 해지 필수': 0 };
+  active.forEach(s => {
+    if (s.alertType === 'personal' || s.alertType === 'personal_admin') alertCount['개인 알림']++;
+    else if (s.alertType === 'admin_critical') alertCount['퇴사 해지 필수']++;
     else alertCount['총무 알림']++;
   });
   charts['sw-alert'] = new Chart(document.getElementById('sw-chart-alert'), {
@@ -1514,14 +1606,7 @@ function renderSwDashboard() {
     options: { plugins: { legend: { position: 'right', labels: { font: { size: 11 }, boxWidth: 10, padding: 8 } } }, maintainAspectRatio: false }
   });
 
-  if (charts['sw-form']) { charts['sw-form'].destroy(); }
-  const formCount = countBy(active, s => s.form || '기타');
-  charts['sw-form'] = new Chart(document.getElementById('sw-chart-form'), {
-    type: 'doughnut',
-    data: { labels: Object.keys(formCount), datasets: [{ data: Object.values(formCount), backgroundColor: PALETTE, borderWidth: 0 }] },
-    options: { plugins: { legend: { position: 'right', labels: { font: { size: 11 }, boxWidth: 10, padding: 8 } } }, maintainAspectRatio: false }
-  });
-
+  // D-10 임박 목록
   const el = document.getElementById('sw-soon-list');
   if (!soon.length) {
     el.innerHTML = '<div class="empty-state"><div class="ic">✅</div>만료 임박 항목이 없어요.</div>';
