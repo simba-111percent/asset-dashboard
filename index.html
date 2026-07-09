@@ -452,6 +452,7 @@ tbody tr:last-child td { border-bottom: none; }
                 <th>유형</th>
                 <th>상태</th>
                 <th>사용자</th>
+                <th>전 사용자</th>
                 <th>위치</th>
                 <th>스펙</th>
                 <th>취득일</th>
@@ -1107,6 +1108,7 @@ function renderList() {
         <td><span class="badge b-cat">${escapeHtml(a.cat)}</span></td>
         <td><span class="badge ${statusBadgeClass(a.status)}">${escapeHtml(a.status)}</span></td>
         <td contenteditable="false" class="">${escapeHtml(a.user)}</td>
+        <td style="color:var(--text-muted);font-size:12px;">${escapeHtml(a.prevUser) || '—'}</td>
         <td>${loc}</td>
         <td style="color:var(--text-muted); font-size:11.5px;">${escapeHtml(spec) || '—'}</td>
         <td style="white-space:nowrap;">${escapeHtml(a.acqDate) || '—'}</td>
@@ -1931,12 +1933,26 @@ function logSync(msg, isError) {
 }
 
 function parseHwSheetData(sheetData) {
-  const tabConfig = {
-    '데스크탑(250715)': { headerRow: 7, hasMain: true },
-    'MAC(250715)':      { headerRow: 7, hasMain: true },
-    'NT(250715)':       { headerRow: 8, hasMain: true },
-    '타블렛,모바일,음향': { headerRow: 8, hasMain: false },
+  // 실제 시트의 탭 이름을 먼저 확인해서 유연하게 매칭
+  const allTabs = Object.keys(sheetData);
+
+  // 탭명 유연 매칭 (날짜 부분이 바뀌어도 동작)
+  function findTab(keyword) {
+    return allTabs.find(t => t.includes(keyword)) || null;
+  }
+
+  const tabMap = {
+    [findTab('데스크탑')]: { headerRow: 7, hasMain: true },
+    [findTab('MAC')]:      { headerRow: 7, hasMain: true },
+    [findTab('NT')]:       { headerRow: 8, hasMain: true },
+    [findTab('타블렛')]:   { headerRow: 8, hasMain: false },
   };
+  // null 키 제거
+  delete tabMap['null'];
+  delete tabMap[null];
+
+  console.log('[HW Pull] 감지된 탭:', allTabs);
+  console.log('[HW Pull] 매칭된 탭:', Object.keys(tabMap));
 
   function normalizeCorp(v) {
     if (!v) return '111percent';
@@ -1974,7 +1990,8 @@ function parseHwSheetData(sheetData) {
   const result = [];
   let aid = 1;
 
-  Object.entries(tabConfig).forEach(([tabName, cfg]) => {
+  Object.entries(tabMap).forEach(([tabName, cfg]) => {
+    if (!tabName || !cfg) return;
     const rows = sheetData[tabName];
     if (!rows || !Array.isArray(rows)) return;
 
@@ -2032,7 +2049,12 @@ function parseHwSheetData(sheetData) {
 }
 
 async function fetchSheet(url) {
-  const res = await fetch(url);
+  // 캐시 방지: 매 요청마다 타임스탬프 파라미터 추가
+  const cacheBust = `?t=${Date.now()}`;
+  const res = await fetch(url + cacheBust, {
+    cache: 'no-store',
+    headers: { 'Cache-Control': 'no-cache' }
+  });
   return await res.json();
 }
 
