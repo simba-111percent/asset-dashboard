@@ -754,22 +754,21 @@ tbody tr:last-child td { border-bottom: none; }
       <div class="table-card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
         <div class="field-section" style="margin-top:0;">1. Apps Script 웹앱 URL 설정</div>
         <p style="font-size:12.5px; color:var(--text-sub); margin-bottom: 1rem; line-height:1.7;">
-          각 구글시트에 아래 Apps Script 코드를 설치하고 발급받은 URL을 입력하세요.
+          연동 URL이 고정 설정되어 있어요. 별도 입력 없이 접속하면 자동으로 연동됩니다.
         </p>
 
         <div class="field">
           <label>HW 자산관리대장 URL</label>
-          <input type="text" id="url-hw" placeholder="https://script.google.com/macros/s/.../exec">
+          <input type="text" id="url-hw" readonly style="color:var(--text-muted);">
         </div>
         <div class="field">
           <label>SW 자산관리대장 URL</label>
-          <input type="text" id="url-sw" placeholder="https://script.google.com/macros/s/.../exec">
+          <input type="text" id="url-sw" readonly style="color:var(--text-muted);">
         </div>
         <div class="field">
           <label>좌석배치도 URL</label>
-          <input type="text" id="url-seats" placeholder="https://script.google.com/macros/s/.../exec">
+          <input type="text" id="url-seats" readonly style="color:var(--text-muted);">
         </div>
-        <button class="btn btn-primary" onclick="saveSheetConfig()">연결 저장</button>
 
         <div class="field-section">2. 최신 데이터 가져오기</div>
         <p style="font-size:12.5px; color:var(--text-sub); margin-bottom: 1rem; line-height:1.7;">
@@ -1909,45 +1908,31 @@ function deleteSwItem() {
   renderSwDashboard();
 }
 
+// ============ Google Sheets 고정 URL ============
+const SHEET_URLS = {
+  hw:    'https://script.google.com/macros/s/AKfycbzHrOKai_eqng5PyE5xrHi1t1laX_3fbdv5rkrPnu97lf5CKw_xCAP2HsGEb7-LJnMM/exec',
+  sw:    'https://script.google.com/macros/s/AKfycbwgkMtIaoJM6m8cziYaUqe7iAA2y-mEl3Dj9jhnU1qJUv0UbuYnsN_WX9zmzkkzW8XC/exec',
+  seats: 'https://script.google.com/macros/s/AKfycby_53FOoJu9Gul4AO52z-TkJNUw5vIx7adW_Q438ew-4yJP7dz71mk89VCPXy3Hc9aixA/exec'
+};
+
 // ============ Google Sheets Sync (3개 시트) ============
 function loadSheetConfig() {
-  try { return JSON.parse(localStorage.getItem(LS_SHEET_KEY) || '{}'); }
-  catch(e) { return {}; }
+  return SHEET_URLS;
 }
 
 function saveSheetConfig() {
-  const hw = (document.getElementById('url-hw') || {}).value?.trim() || '';
-  const sw = (document.getElementById('url-sw') || {}).value?.trim() || '';
-  const seats = (document.getElementById('url-seats') || {}).value?.trim() || '';
-  localStorage.setItem(LS_SHEET_KEY, JSON.stringify({ hw, sw, seats }));
-  updateSyncBar();
-  logSync('연동 설정을 저장했어요. 데이터를 가져오는 중...');
-  // 설정 저장 후 즉시 Pull 시작
-  hideScreens();
-  showLoading('구글시트에서 최신 데이터를 가져오는 중...');
-  pullFromSheet(false).then(() => {
-    hideLoading();
-    renderDashboard();
-    startAutoSync();
-  });
+  // URL이 고정이라 저장 불필요 — 입력값만 로그로 남김
+  logSync('연동 URL은 고정 설정입니다.');
+  startAutoSync();
 }
 
 function updateSyncBar() {
-  const cfg = loadSheetConfig();
   const dot = document.getElementById('sync-dot');
   const text = document.getElementById('sync-status-text');
   const btnPull = document.getElementById('btn-pull');
-  const connected = cfg.hw || cfg.seats;
-  if (connected) {
-    dot.className = 'sync-status-dot on';
-    const parts = [cfg.hw && 'HW', cfg.seats && '좌석'].filter(Boolean);
-    text.innerHTML = `구글시트 연동됨 (${parts.join(' · ')}) — <strong>5분마다 자동 갱신</strong>`;
-    btnPull.disabled = false;
-  } else {
-    dot.className = 'sync-status-dot off';
-    text.innerHTML = `구글시트 연동 안 됨 — <strong>구글시트 연동</strong> 메뉴에서 설정하세요`;
-    btnPull.disabled = true;
-  }
+  if (dot) dot.className = 'sync-status-dot on';
+  if (text) text.innerHTML = `구글시트 연동됨 (HW · 좌석) — <strong>5분마다 자동 갱신</strong>`;
+  if (btnPull) btnPull.disabled = false;
 }
 
 function logSync(msg, isError) {
@@ -2103,9 +2088,7 @@ function fetchSheet(url) {
 }
 
 async function pullFromSheet(silent = false) {
-  const cfg = loadSheetConfig();
-  const hasAny = cfg.hw || cfg.seats;
-  if (!hasAny) { if (!silent) switchView('sync'); return; }
+  const cfg = SHEET_URLS;
   if (!silent) logSync('구글시트에서 가져오는 중...');
 
   const done = [];
@@ -2208,13 +2191,12 @@ async function pullFromSheet(silent = false) {
 }
 
 function renderSyncView() {
-  const cfg = loadSheetConfig();
   const elHw = document.getElementById('url-hw');
   const elSw = document.getElementById('url-sw');
   const elSeats = document.getElementById('url-seats');
-  if (elHw) elHw.value = cfg.hw || '';
-  if (elSw) elSw.value = cfg.sw || '';
-  if (elSeats) elSeats.value = cfg.seats || '';
+  if (elHw) { elHw.value = SHEET_URLS.hw; elHw.readOnly = true; elHw.style.color = 'var(--text-muted)'; }
+  if (elSw) { elSw.value = SHEET_URLS.sw; elSw.readOnly = true; elSw.style.color = 'var(--text-muted)'; }
+  if (elSeats) { elSeats.value = SHEET_URLS.seats; elSeats.readOnly = true; elSeats.style.color = 'var(--text-muted)'; }
   const codeEl = document.getElementById('apps-script-code');
   if (codeEl) codeEl.textContent = APPS_SCRIPT_CODE;
 }
@@ -2262,26 +2244,15 @@ async function init() {
   loadSw();
   updateSyncBar();
 
-  const cfg = loadSheetConfig();
-  const hasAny = cfg.hw || cfg.seats;
-
-  if (!hasAny) {
-    // 연동 설정 없으면 안내 화면
-    showNoConfig();
-    return;
-  }
-
-  // 연동 있으면 즉시 Pull
+  // URL 고정이므로 항상 즉시 Pull
   showLoading('구글시트에서 최신 데이터를 가져오는 중...');
   await pullFromSheet(false);
   hideLoading();
   renderDashboard();
 
-  // 이후 5분마다 자동 Pull
+  // 5분마다 자동 Pull
   if (window._autoSyncInterval) clearInterval(window._autoSyncInterval);
-  window._autoSyncInterval = setInterval(async () => {
-    await pullFromSheet(true);
-  }, 5 * 60 * 1000);
+  window._autoSyncInterval = setInterval(() => pullFromSheet(true), 5 * 60 * 1000);
 }
 
 function startAutoSync() {
