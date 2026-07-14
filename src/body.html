@@ -1,0 +1,478 @@
+<nav class="nav">
+      <button class="nav-item active" data-view="dashboard" onclick="switchView('dashboard')">
+        <span class="nav-icon">▣</span> 대시보드
+      </button>
+      <button class="nav-item" data-view="list" onclick="switchView('list')">
+        <span class="nav-icon">☰</span> 자산 목록
+      </button>
+      <button class="nav-item" data-view="replace" onclick="switchView('replace')">
+        <span class="nav-icon">⚠</span> 교체 대상
+      </button>
+      <button class="nav-item" data-view="stock" onclick="switchView('stock')">
+        <span class="nav-icon">📦</span> 재고 현황
+      </button>
+      <button class="nav-item" data-view="people" onclick="switchView('people')">
+        <span class="nav-icon">◍</span> 사용자별 자산
+      </button>
+      <div class="nav-divider"></div>
+      <div class="nav-section-label">SW 자산</div>
+      <button class="nav-item" data-view="sw-dashboard" onclick="switchView('sw-dashboard')">
+        <span class="nav-icon">▣</span> SW 대시보드
+      </button>
+      <button class="nav-item" data-view="sw-list" onclick="switchView('sw-list')">
+        <span class="nav-icon">☰</span> SW 라이선스
+      </button>
+      <button class="nav-item" data-view="sw-alert" onclick="switchView('sw-alert')">
+        <span class="nav-icon">🔔</span> 구독 만료 현황
+      </button>
+      <div class="nav-divider"></div>
+      <button class="nav-item" data-view="sync" onclick="switchView('sync')">
+        <span class="nav-icon">⇄</span> 구글시트 연동
+      </button>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Sync status bar (always visible) -->
+    <div class="sync-bar">
+      <div class="sync-status-dot off" id="sync-dot"></div>
+      <div class="sync-text" id="sync-status-text">구글시트 연동 안 됨 — <strong>구글시트 연동</strong> 메뉴에서 설정하세요</div>
+      <div class="sync-actions">
+        <button class="btn btn-sm" onclick="pullFromSheet()" id="btn-pull">↓ 최신 데이터 가져오기</button>
+      </div>
+    </div>
+
+    <!-- ============ DASHBOARD VIEW ============ -->
+    <section class="view active" id="view-dashboard">
+      <div class="page-hd">
+        <div>
+          <div class="page-title">자산 현황 대시보드</div>
+          <div class="page-sub" id="dash-updated">—</div>
+        </div>
+      </div>
+
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">전체 자산</div>
+          <div class="stat-value" id="st-total">—</div>
+          <div class="stat-foot">불용자산 제외</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">사용중</div>
+          <div class="stat-value success" id="st-used">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">재고</div>
+          <div class="stat-value info" id="st-stock">—</div>
+          <div class="stat-foot" id="st-stock-loc">위치 미확인 포함</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">미확인</div>
+          <div class="stat-value warn" id="st-unknown">—</div>
+          <div class="stat-foot">실사 필요</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">교체 대상</div>
+          <div class="stat-value danger" id="st-replace">—</div>
+          <div class="stat-foot">사용중 · 5년 초과/잔존가 0</div>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-title">자산 유형별 분포</div>
+          <div class="chart-wrap"><canvas id="chart-category"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">OS 분포</div>
+          <div class="chart-wrap"><canvas id="chart-os"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">RAM 스펙 분포 (사용중)</div>
+          <div class="chart-wrap"><canvas id="chart-ram"></canvas></div>
+        </div>
+        <div class="chart-card wide">
+          <div class="chart-title">연도별 취득 추이</div>
+          <div class="chart-wrap tall"><canvas id="chart-yearly"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">자산명별 분포</div>
+          <div class="chart-wrap"><canvas id="chart-age"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LIST VIEW ============ -->
+    <section class="view" id="view-list">
+      <div class="page-hd">
+        <div>
+          <div class="page-title">자산 목록</div>
+          <div class="page-sub" id="list-count">—</div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-box">
+          <span class="ic">⌕</span>
+          <input type="text" id="search-input" placeholder="자산번호, 자산명, 사용자 검색 (구 번호도 검색됨)" oninput="renderList()">
+        </div>
+        <select class="select-filter" id="filter-category" onchange="renderList()">
+          <option value="">전체 유형</option>
+          <option value="DESKTOP">DESKTOP</option>
+          <option value="MAC">MAC</option>
+          <option value="NOTEBOOK">NOTEBOOK</option>
+          <option value="TABLET">TABLET</option>
+          <option value="MOBILE">MOBILE</option>
+          <option value="AUDIO">AUDIO</option>
+          <option value="NETWORK">NETWORK</option>
+        </select>
+        <select class="select-filter" id="filter-corp" onchange="renderList()">
+          <option value="">전체 법인</option>
+        </select>
+        <div class="spacer"></div>
+        <button class="btn btn-sm" onclick="exportCSV()">⬇ CSV 내보내기</button>
+      </div>
+
+      <div class="chip-row" style="margin-bottom: 1rem;">
+        <button class="chip on" data-status="" onclick="setStatusFilter('')">전체</button>
+        <button class="chip" data-status="사용중" onclick="setStatusFilter('사용중')">사용중</button>
+        <button class="chip" data-status="재고" onclick="setStatusFilter('재고')">재고</button>
+        <button class="chip" data-status="미확인" onclick="setStatusFilter('미확인')">미확인</button>
+        <button class="chip" data-status="위치미확인" onclick="setStatusFilter('위치미확인')">재고·위치미확인</button>
+      </div>
+
+      <div class="table-card">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>자산번호</th>
+                <th>자산명</th>
+                <th>유형</th>
+                <th>상태</th>
+                <th>사용자</th>
+                <th>전 사용자</th>
+                <th>위치</th>
+                <th>스펙</th>
+                <th>취득일</th>
+                <th>잔존가액</th>
+              </tr>
+            </thead>
+            <tbody id="asset-tbody"></tbody>
+          </table>
+        </div>
+        <div class="pager">
+          <span id="pager-info">—</span>
+          <div class="pager-btns">
+            <button class="btn btn-sm" onclick="prevPage()">← 이전</button>
+            <button class="btn btn-sm" onclick="nextPage()">다음 →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ REPLACE CANDIDATES VIEW ============ -->
+    <section class="view" id="view-replace">
+      <div class="page-hd">
+        <div>
+          <div class="page-title">교체 대상 장비</div>
+          <div class="page-sub">취득 5년 초과 또는 잔존가액 0원인 사용중 장비</div>
+        </div>
+      </div>
+      <div class="replace-list" id="replace-list"></div>
+    </section>
+
+    <!-- ============ STOCK VIEW ============ -->
+    <section class="view" id="view-stock">
+      <div class="page-hd">
+        <div>
+          <div class="page-title">재고 현황</div>
+          <div class="page-sub">현재 미지급 상태의 자산 목록 · 사용 가능 재고와 노후 재고를 구분해서 보여줘요</div>
+        </div>
+      </div>
+
+      <div class="stats-grid" style="grid-template-columns:repeat(2,1fr);max-width:500px;margin-bottom:1.5rem;">
+        <div class="stat-card">
+          <div class="stat-label">✅ 사용 가능 재고</div>
+          <div class="stat-value success" id="stock-usable-count">—</div>
+          <div class="stat-foot">5년 이내 · 잔존가액 있음</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">⚠ 노후 재고</div>
+          <div class="stat-value warn" id="stock-old-count">—</div>
+          <div class="stat-foot">5년 초과 또는 잔존가액 0</div>
+        </div>
+      </div>
+
+      <!-- 사용 가능 재고 -->
+      <div class="chart-title" style="margin-bottom:0.75rem;">✅ 사용 가능 재고</div>
+      <div class="table-card" style="margin-bottom:1.5rem;">
+        <div class="table-scroll" id="stock-usable-list"></div>
+      </div>
+
+      <!-- 노후 재고 -->
+      <div class="chart-title" style="margin-bottom:0.75rem;">⚠ 노후 재고 (교체 검토 필요)</div>
+      <div class="replace-list" id="stock-old-list"></div>
+    </section>
+
+    <!-- ============ PEOPLE VIEW ============ -->
+    <section class="view" id="view-people">
+      <div class="page-hd">
+        <div>
+          <div class="page-title">사용자별 자산</div>
+          <div class="page-sub">좌석배치도(성수 사옥)와 자산 데이터를 닉네임으로 매칭해서 보여줘요</div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-box">
+          <span class="ic">⌕</span>
+          <input type="text" id="people-search" placeholder="닉네임 또는 좌석번호로 검색" oninput="renderPeople()">
+        </div>
+        <select class="select-filter" id="people-floor-filter" onchange="renderPeople()">
+          <option value="">전체 층</option>
+        </select>
+        <div class="spacer"></div>
+        <span style="font-size:12px; color:var(--text-muted);" id="people-match-rate"></span>
+      </div>
+
+      <div class="table-card">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>닉네임</th>
+                <th>층 / 좌석</th>
+                <th>보유 자산 수</th>
+                <th>자산 목록</th>
+              </tr>
+            </thead>
+            <tbody id="people-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SW DASHBOARD VIEW ============ -->
+    <section class="view" id="view-sw-dashboard">
+      <div class="page-hd">
+        <div>
+          <div class="page-title">SW 자산 대시보드</div>
+          <div class="page-sub" id="sw-dash-updated">—</div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">전체 구독</div><div class="stat-value" id="sw-st-total">—</div></div>
+        <div class="stat-card"><div class="stat-label">연간 구독</div><div class="stat-value info" id="sw-st-annual">—</div></div>
+        <div class="stat-card"><div class="stat-label">월간 구독</div><div class="stat-value accent" id="sw-st-monthly">—</div></div>
+        <div class="stat-card"><div class="stat-label">D-10 만료 임박</div><div class="stat-value warn" id="sw-st-soon">—</div></div>
+        <div class="stat-card"><div class="stat-label">연간 비용 (원화)</div><div class="stat-value success" id="sw-st-krw" style="font-size:16px;">—</div></div>
+        <div class="stat-card"><div class="stat-label">연간 비용 (달러)</div><div class="stat-value info" id="sw-st-usd" style="font-size:16px;">—</div></div>
+      </div>
+
+      <div class="charts-grid" style="grid-template-columns: repeat(2,1fr);">
+        <div class="chart-card wide" style="grid-column:span 2;">
+          <div class="chart-title">월별 만료 예정 건수</div>
+          <div class="chart-wrap tall"><canvas id="sw-chart-expire"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">연간 비용 현황</div>
+          <div class="chart-wrap"><canvas id="sw-chart-cost"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">알림 유형별 분포</div>
+          <div class="chart-wrap"><canvas id="sw-chart-alert"></canvas></div>
+        </div>
+      </div>
+
+      <!-- D-30 임박 목록 -->
+      <div class="chart-card" style="margin-top:12px;">
+        <div class="chart-title">⚠ 만료 임박 (D-30 이내)</div>
+        <div id="sw-soon-list" style="margin-top:0.5rem;"></div>
+      </div>
+    </section>
+
+    <!-- ============ SW LIST VIEW ============ -->
+    <section class="view" id="view-sw-list">
+      <div class="page-hd">
+        <div>
+          <div class="page-title">SW 라이선스 목록</div>
+          <div class="page-sub" id="sw-list-count">—</div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-box">
+          <span class="ic">⌕</span>
+          <input type="text" id="sw-search" placeholder="제품명, 사용자 검색" oninput="renderSwList()">
+        </div>
+        <select class="select-filter" id="sw-filter-form" onchange="renderSwList()">
+          <option value="">전체 형태</option>
+          <option value="Annual">연간</option>
+          <option value="Monthly">월간</option>
+        </select>
+        <select class="select-filter" id="sw-filter-tab" onchange="renderSwList()">
+          <option value="">전체 탭</option>
+          <option value="전사 공통 Saas">전사 공통 SaaS</option>
+          <option value="MS">MS</option>
+          <option value="Adobe">Adobe</option>
+          <option value="Unity">Unity</option>
+          <option value="JetBrains">JetBrains</option>
+          <option value="Autodesk">Autodesk</option>
+          <option value="AI Tool">AI Tool</option>
+          <option value="구독서비스">구독서비스</option>
+        </select>
+        <select class="select-filter" id="sw-filter-alert" onchange="renderSwList()">
+          <option value="">전체 알림유형</option>
+          <option value="personal">개인 알림</option>
+          <option value="personal_admin">개인+총무 알림</option>
+          <option value="dual">사용자2명+총무 알림</option>
+          <option value="admin">총무 알림</option>
+          <option value="admin_critical">⚠ 퇴사 시 해지 필수</option>
+        </select>
+        <div class="spacer"></div>
+        <button class="btn btn-sm" onclick="exportSwCSV()">⬇ CSV</button>
+      </div>
+
+      <div class="chip-row" style="margin-bottom:1rem;">
+        <button class="chip on" data-sw-status="" onclick="setSwStatusFilter('')">전체</button>
+        <button class="chip" data-sw-status="active" onclick="setSwStatusFilter('active')">유효</button>
+        <button class="chip" data-sw-status="soon" onclick="setSwStatusFilter('soon')">만료임박</button>
+        <button class="chip" data-sw-status="expired" onclick="setSwStatusFilter('expired')">만료됨</button>
+        <button class="chip" data-sw-status="nodate" onclick="setSwStatusFilter('nodate')">만료일 없음(자동결제)</button>
+      </div>
+
+      <div class="table-card">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>제품명</th>
+                <th>계정</th>
+                <th>사용자</th>
+                <th>결제형태</th>
+                <th>만료일</th>
+                <th>D-day</th>
+                <th>금액</th>
+                <th>알림유형</th>
+                <th>비고</th>
+              </tr>
+            </thead>
+            <tbody id="sw-tbody"></tbody>
+          </table>
+        </div>
+        <div class="pager">
+          <span id="sw-pager-info">—</span>
+          <div class="pager-btns">
+            <button class="btn btn-sm" onclick="swPrevPage()">← 이전</button>
+            <button class="btn btn-sm" onclick="swNextPage()">다음 →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SW ALERT VIEW ============ -->
+    <section class="view" id="view-sw-alert">
+      <div class="page-hd">
+        <div>
+          <div class="page-title">구독 만료 현황</div>
+          <div class="page-sub">만료 D-30 이내 항목 및 알림 발송 대상 관리</div>
+        </div>
+      </div>
+
+      <!-- 알림 구조 안내 -->
+      <div class="table-card" style="padding:1.25rem; margin-bottom:1.25rem;">
+        <div class="chart-title" style="margin-bottom:0.75rem;">📢 알림 발송 구조</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; font-size:12.5px;">
+          <div style="background:var(--success-bg); border:0.5px solid var(--success-border); border-radius:8px; padding:12px;">
+            <div style="font-weight:700; color:var(--success); margin-bottom:5px;">✅ 개인 알림</div>
+            <div style="color:var(--text-sub);">사용자 1명 특정 가능<br>→ 해당 사용자 DM<br>→ 심바/시온 동시 수신</div>
+          </div>
+          <div style="background:var(--warn-bg); border:0.5px solid var(--warn-border); border-radius:8px; padding:12px;">
+            <div style="font-weight:700; color:var(--warn); margin-bottom:5px;">⚠ 총무 알림</div>
+            <div style="color:var(--text-sub);">공용계정/다수 사용자<br>→ 심바/시온에게만 DM<br>"직접 확인 필요" 안내</div>
+          </div>
+          <div style="background:var(--danger-bg); border:0.5px solid var(--danger-border); border-radius:8px; padding:12px;">
+            <div style="font-weight:700; color:var(--danger); margin-bottom:5px;">🚨 퇴사 시 해지 필수</div>
+            <div style="color:var(--text-sub);">개인 명의 계정 결제<br>→ 심바/시온 즉시 알림<br>퇴사자 발생 시 반드시 확인</div>
+          </div>
+        </div>
+        <div style="margin-top:12px; font-size:12px; color:var(--text-muted);">
+          * 알림 발송 기준: 만료 <strong>D-10</strong> · 월간/연간 구독 동일 적용 · 슬랙 봇 설치 승인 후 자동 발송 예정
+        </div>
+      </div>
+
+      <!-- 만료 임박 목록 -->
+      <div class="table-card">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>제품명</th>
+                <th>사용자</th>
+                <th>만료일</th>
+                <th>D-day</th>
+                <th>알림 유형</th>
+                <th>알림 대상</th>
+                <th>응답 상태</th>
+              </tr>
+            </thead>
+            <tbody id="sw-alert-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SYNC VIEW ============ -->
+    <section class="view" id="view-sync">
+      <div class="page-hd">
+        <div>
+          <div class="page-title">구글시트 연동</div>
+          <div class="page-sub">HW 자산 · SW 자산 · 좌석배치도 시트를 각각 연동해요. 연동 후 5분마다 자동 갱신됩니다.</div>
+        </div>
+      </div>
+
+      <div class="table-card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
+        <div class="field-section" style="margin-top:0;">1. Apps Script 웹앱 URL 설정</div>
+        <p style="font-size:12.5px; color:var(--text-sub); margin-bottom: 1rem; line-height:1.7;">
+          연동 URL이 고정 설정되어 있어요. 별도 입력 없이 접속하면 자동으로 연동됩니다.
+        </p>
+
+        <div class="field">
+          <label>HW 자산관리대장 URL</label>
+          <input type="text" id="url-hw" readonly style="color:var(--text-muted);">
+        </div>
+        <div class="field">
+          <label>SW 자산관리대장 URL</label>
+          <input type="text" id="url-sw" readonly style="color:var(--text-muted);">
+        </div>
+        <div class="field">
+          <label>좌석배치도 URL</label>
+          <input type="text" id="url-seats" readonly style="color:var(--text-muted);">
+        </div>
+
+        <div class="field-section">2. 최신 데이터 가져오기</div>
+        <p style="font-size:12.5px; color:var(--text-sub); margin-bottom: 1rem; line-height:1.7;">
+          페이지 접속 시 자동으로 가져오며, 5분마다 갱신됩니다. 즉시 갱신하려면 아래 버튼을 클릭하세요.
+        </p>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="pullFromSheet()">↓ 전체 최신 데이터 가져오기</button>
+        </div>
+        <div id="sync-log" style="margin-top:1rem; font-size:12px; color:var(--text-muted);"></div>
+      </div>
+
+      <div class="table-card" style="padding: 1.5rem;">
+        <div class="field-section" style="margin-top:0;">Apps Script 코드 (3개 시트 모두 동일)</div>
+        <p style="font-size:12.5px; color:var(--text-sub); margin-bottom: 0.75rem;">
+          각 구글시트 열기 → <strong>확장 프로그램 → Apps Script</strong> → 기존 코드 전체 삭제 후 아래 코드 붙여넣기 → <strong>배포 → 새 배포 → 웹앱 → 액세스: 전체 허용</strong> → URL 복사 후 위에 입력
+        </p>
+        <pre id="apps-script-code" style="background: var(--surface-2); border-radius: 8px; padding: 1rem; font-size: 11.5px; overflow-x: auto; white-space: pre; line-height: 1.6; border: 0.5px solid var(--border);"></pre>
+        <button class="btn btn-sm" onclick="copyScript()" style="margin-top:0.75rem;">코드 복사</button>
+      </div>
+    </section>
+
+  </main>
