@@ -634,7 +634,7 @@ let swPage = 1;
 const SW_PAGE_SIZE = 30;
 
 function loadSw() {
-  // SW는 내장 데이터 사용 (시트 구조가 복잡해 실시간 연동 대신 파일 업데이트 방식)
+  // 최초 로드 시 임시 표시용 (구글시트 실시간 pull 전까지). pullFromSheet()에서 실제 데이터로 교체됨
   swList = typeof SEED_SW !== 'undefined' ? JSON.parse(JSON.stringify(SEED_SW)) : [];
 }
 
@@ -1259,6 +1259,183 @@ function parseHwSheetData(sheetData) {
   return result;
 }
 
+function parseSwSheetData(sheetData) {
+  const TAB_CONFIGS = {
+    '전사 공통 Saas': { headerRow: 10, cols: { cat: 0, name: 1, variant: 2, expire: 3, form: 4, price: 5, note: 6 }, fillDown: ['cat'] },
+    'MS':            { headerRow: 8,  cols: { cat: 0, name: 1, account: 2, pw: 3, users: [4,5,6,7,8,9,10], expire: 11 }, fillDown: ['cat','name'], skipIfNoUsers: true },
+    'Adobe':         { headerRow: 8,  cols: { cat: 0, name: 1, account: 2, pw: 3, users: [4,5], expire: 6, price: 7, note: 8 }, fillDown: ['cat'] },
+    'Unity':         { headerRow: 9,  cols: { cat: 0, name: 1, account: 2, pw: 3, serial: 4, users: [5,6], expire: 9, price: 10, note: 11 }, fillDown: ['cat','name'] },
+    'JetBrains':     { headerRow: 3,  cols: { cat: 0, name: 1, serial: 2, account: 3, users: [4], expire: 5, price: 6, note: 7 }, fillDown: ['cat','name'] },
+    'Autodesk':      { headerRow: 9,  cols: { cat: 0, name: 1, account: 2, pw: 3, users: [4], expire: 5, price: 6, note: 7 }, fillDown: ['cat'] },
+    '구독서비스':      { headerRow: 8,  cols: { cat: 0, name: 1, account: 2, users: [3], start: 4, expire: 5, form: 6, price: 7, note: 8, admin: 9, pw: 10, link: 11 }, fillDown: ['cat','name'] },
+    'AI Tool':       { headerRow: 1,  cols: { cat: 1, vendor: 2, name: 3, account: 4, users: [5], start: 6, expire: 7, form: 8, price: 9, note: 10, admin: 11 }, fillDown: ['cat','vendor','name'], commaUsers: true, mergeVendorName: true },
+    '영구라이선스':    { headerRow: 8,  cols: { cat: 0, name: 1, serial: 2, users: [3], expire: 4, price: 5, note: 6, account: 7, pw: 8, link: 9 }, fillDown: ['cat','name','account','pw','link','serial'], perpetual: true },
+  };
+
+  function cv(v) {
+    if (v === null || v === undefined) return '';
+    return String(v).trim();
+  }
+
+  function isEmpty(v) {
+    return v === null || v === undefined || cv(v) === '';
+  }
+
+  function cd(v) {
+    // 날짜 -> yyyy-mm-dd 문자열. Lifetime/'-' 등은 빈 문자열(만료일 없음)로 정규화
+    if (isEmpty(v)) return '';
+    if (v instanceof Date) return v.toISOString().slice(0, 10);
+    const s = String(v).trim();
+    if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
+    if (/^lifetime$/i.test(s) || s === '-') return '';
+    if (typeof v === 'number') {
+      // 구글시트 시리얼 넘버 -> 날짜 (거의 안 쓰이지만 대비)
+      const d = new Date(Math.round((v - 25569) * 86400 * 1000));
+      return d.toISOString().slice(0, 10);
+    }
+    return s; // 알 수 없는 형태는 원문 유지 (검색/표시용)
+  }
+
+  function parsePrice(raw, fmt) {
+    if (isEmpty(raw)) return { price: 0, currency: 'KRW' };
+    if (typeof raw === 'number') {
+      let currency = 'KRW';
+      if (fmt && /\$|USD/i.test(fmt)) currency = 'USD';
+      else if (fmt && /€|EUR/i.test(fmt)) currency = 'EUR';
+      else if (fmt && /£|GBP/i.test(fmt)) currency = 'GBP';
+      return { price: raw, currency };
+    }
+    const s = String(raw).trim();
+    if (s.includes('$')) return { price: parseFloat(s.replace(/[^0-9.]/g, '')) || 0, currency: 'USD' };
+    if (s.includes('€')) return { price: parseFloat(s.replace(/\./g, '').replace(',', '.').replace(/[^0-9.]/g, '')) || 0, currency: 'EUR' };
+    if (s.includes('£')) return { price: parseFloat(s.replace(/[^0-9.]/g, '')) || 0, currency: 'GBP' };
+    const n = parseFloat(s.replace(/,/g, ''));
+    if (!isNaN(n)) {
+      let currency = 'KRW';
+      if (fmt && /\$|USD/i.test(fmt)) currency = 'USD';
+      else if (fmt && /€|EUR/i.test(fmt)) currency = 'EUR';
+      return { price: n, currency };
+    }
+    return { price: 0, currency: 'KRW' }; // 숫자로 못 읽으면 0 처리
+  }
+
+  function getRows(tabName) {
+    const d = sheetData[tabName];
+    if (!d) return null;
+    if (Array.isArray(d)) return d;            // 구 포맷: 탭이름 -> [[행...]]
+    if (d.values) return d.values;              // 신 포맷: 탭이름 -> {values, formats}
+    return null;
+  }
+  function getFormats(tabName) {
+    const d = sheetData[tabName];
+    if (d && !Array.isArray(d) && d.formats) return d.formats;
+    return null;
+  }
+
+  const allTabs = Object.keys(sheetData);
+  const result = [];
+  let sid = 1;
+
+  Object.entries(TAB_CONFIGS).forEach(([tabName, cfg]) => {
+    // 탭 이름 정확히 일치하는 것만 사용 (Adobe(2024~2025) 같은 아카이브 탭 오매칭 방지)
+    const realTab = allTabs.find(t => t.trim() === tabName);
+    if (!realTab) return;
+    const rows = getRows(realTab);
+    if (!rows) return;
+    const formats = getFormats(realTab);
+
+    const last = {}; // fill-down 캐시
+
+    for (let i = cfg.headerRow + 1; i < rows.length; i++) {
+      const r = rows[i];
+      if (!r || !r.some(c => !isEmpty(c))) continue;
+
+      // fill-down 처리
+      (cfg.fillDown || []).forEach(key => {
+        const idx = cfg.cols[key];
+        if (idx === undefined) return;
+        const raw = r[idx];
+        if (!isEmpty(raw)) last[key] = raw;
+      });
+      function val(key) {
+        const idx = cfg.cols[key];
+        if (idx === undefined) return '';
+        const raw = r[idx];
+        if (!isEmpty(raw)) return raw;
+        return (cfg.fillDown || []).includes(key) ? (last[key] || '') : '';
+      }
+
+      // 사용자 컬럼(단일 index 또는 배열)
+      let users = [];
+      const uc = cfg.cols.users;
+      if (Array.isArray(uc)) {
+        users = uc.map(idx => cv(r[idx])).filter(u => u && u !== '-');
+      } else if (uc !== undefined) {
+        const raw = cv(r[uc]);
+        if (cfg.commaUsers && raw) users = raw.split(/[,\/]/).map(s => s.trim()).filter(Boolean);
+        else if (raw && raw !== '-') users = [raw];
+      }
+
+      if (cfg.skipIfNoUsers && users.length === 0) continue;
+
+      const cat = cv(val('cat'));
+      const vendor = cfg.cols.vendor !== undefined ? cv(val('vendor')) : '';
+      let name = cv(val('name'));
+      if (cfg.mergeVendorName) name = [vendor, name].filter(Boolean).join(' ');
+      if (cfg.cols.variant !== undefined) {
+        const variant = cv(r[cfg.cols.variant]);
+        if (variant) name = [name, variant].filter(Boolean).join(' ');
+      }
+      if (!name && !cat) continue;
+
+      const account = cfg.cols.account !== undefined ? cv(val('account')) : '';
+      const serial = cfg.cols.serial !== undefined ? cv(val('serial')) : '';
+      const startDate = cfg.cols.start !== undefined ? cd(r[cfg.cols.start]) : '';
+      const expireDate = cfg.cols.expire !== undefined ? cd(r[cfg.cols.expire]) : '';
+      const priceIdx = cfg.cols.price;
+      const priceRawCell = priceIdx !== undefined ? r[priceIdx] : null;
+      const priceFmt = formats ? (formats[i] ? formats[i][priceIdx] : null) : null;
+      const { price, currency } = parsePrice(priceRawCell, priceFmt);
+      let form = cfg.cols.form !== undefined ? cv(r[cfg.cols.form]) : '';
+      if (!form) form = cfg.perpetual ? 'Perpetual' : 'Annual';
+      let note = cfg.cols.note !== undefined ? cv(r[cfg.cols.note]) : '';
+      if (cfg.perpetual) {
+        const rawExpire = cv(r[cfg.cols.expire]);
+        if (/lifetime/i.test(rawExpire)) note = [note, '영구 라이선스(Lifetime)'].filter(Boolean).join(' · ');
+      }
+      if (serial) note = [note, serial.length > 40 ? '' : `SN:${serial}`].filter(Boolean).join(' · ');
+
+      // 알림 유형 추정 (수동 지정 필드가 없어서 사용자 수/계정 형태로 추정)
+      let alertType = 'admin';
+      if (users.length === 1) alertType = 'personal';
+      else if (users.length >= 2) alertType = 'dual';
+
+      result.push({
+        id: `sw_${tabName}_${i}`.replace(/\s+/g, ''), // 탭+행번호 기반 고정 ID (재동기화해도 안 바뀜)
+        tab: tabName,
+        cat: cat || tabName,
+        category: cat || tabName, // renderSwList 등에서 쓰는 필드명
+        name: name || '(제품명 미상)',
+        account,
+        users,
+        user: users[0] || '', // 단일 사용자 필드 (검색/구식 코드 호환용)
+        startDate,
+        expireDate,
+        form,
+        price,
+        priceRaw: price, // renderSwList/formatPrice 등에서 쓰는 필드명
+        currency,
+        note,
+        alertType,
+        monthlyEnd: false,
+        monthlyCalc: form === 'Monthly',
+      });
+    }
+  });
+
+  return result;
+}
+
 function fetchSheet(url) {
   return new Promise((resolve, reject) => {
     const cbName = '_cb' + Date.now() + Math.floor(Math.random()*10000);
@@ -1330,8 +1507,27 @@ async function pullFromSheet(silent = false) {
     }
   }
 
-  // SW — 내장 데이터 사용 (시트 구조 복잡으로 별도 관리)
-  // SW URL이 있어도 실제 fetch 생략
+  // SW Pull - 독립 처리 (기존 정적 스냅샷 대신 실시간 파싱)
+  if (cfg.sw) {
+    try {
+      const data = await fetchSheet(cfg.sw);
+      let swAssets = [];
+
+      if (typeof data === 'object' && !Array.isArray(data)) {
+        swAssets = parseSwSheetData(data);
+      }
+
+      if (swAssets.length) {
+        swList = swAssets;
+        loadSwUserData(); // localStorage에 사용자가 수동 추가한 항목 병합
+        done.push(`SW ${swList.length}건`);
+      } else {
+        if (!silent) logSync('SW 파싱 결과 없음 — Apps Script 코드/시트 구조를 확인해주세요', true);
+      }
+    } catch(e) {
+      if (!silent) logSync('SW 가져오기 실패 — ' + e.message, true);
+    }
+  }
 
   // 좌석 Pull - 독립 처리
   if (cfg.seats) {
@@ -1380,6 +1576,9 @@ async function pullFromSheet(silent = false) {
   if (activeView === 'replace') renderReplaceCandidates();
   if (activeView === 'stock') renderStock();
   if (activeView === 'people') renderPeople();
+  if (activeView === 'sw-dashboard') renderSwDashboard();
+  if (activeView === 'sw-list') renderSwList();
+  if (activeView === 'sw-alert') renderSwAlert();
 
   const now = new Date();
   const timeStr = now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'});
@@ -1412,12 +1611,34 @@ const APPS_SCRIPT_CODE = `function doGet(e) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var result = {};
   ss.getSheets().forEach(function(sheet) {
-    var data = sheet.getDataRange().getValues();
-    result[sheet.getName()] = data;
+    var range = sheet.getDataRange();
+    result[sheet.getName()] = {
+      values: range.getValues(),
+      formats: range.getNumberFormats()
+    };
   });
+
+  var json = JSON.stringify(result);
+  var callback = e.parameter.callback;
+
+  var output;
+  if (callback) {
+    output = ContentService
+      .createTextOutput(callback + '(' + json + ')')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  } else {
+    output = ContentService
+      .createTextOutput(json)
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  return output;
+}
+
+function doOptions(e) {
   return ContentService
-    .createTextOutput(JSON.stringify(result))
-    .setMimeType(ContentService.MimeType.JSON);
+    .createTextOutput('')
+    .setMimeType(ContentService.MimeType.TEXT);
 }`;
 
 // ============ 로딩/화면 제어 ============
