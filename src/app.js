@@ -699,6 +699,7 @@ function ddayBadge(dateStr) {
 }
 
 function alertTypeBadge(type) {
+  if (type === 'none') return `<span class="badge" style="opacity:0.55;">해당없음</span>`;
   if (type === 'personal') return `<span class="badge alert-type-personal">개인 알림</span>`;
   if (type === 'personal_admin') return `<span class="badge alert-type-personal">개인+총무 알림</span>`;
   if (type === 'dual') return `<span class="badge" style="background:var(--info-bg);color:var(--info);border:0.5px solid var(--info-border);">사용자2명+총무 알림</span>`;
@@ -812,6 +813,7 @@ function renderSwDashboard() {
   if (charts['sw-alert']) { charts['sw-alert'].destroy(); }
   const alertCount = { '개인 알림': 0, '총무 알림': 0, '퇴사 해지 필수': 0 };
   active.forEach(s => {
+    if (s.alertType === 'none') return; // 영구라이선스 등 알림 대상 아님
     if (s.alertType === 'personal' || s.alertType === 'personal_admin') alertCount['개인 알림']++;
     else if (s.alertType === 'admin_critical') alertCount['퇴사 해지 필수']++;
     else alertCount['총무 알림']++;
@@ -886,7 +888,9 @@ function renderSwList() {
       ? `매월 말일 <span style="font-size:10.5px;color:var(--text-muted);">(${effDate})</span>`
       : s.monthlyCalc
         ? `월간 자동결제 <span style="font-size:10.5px;color:var(--text-muted);">(다음 결제 ${effDate})</span>`
-        : (escapeHtml(s.expireDate) || '<span class="empty-loc">자동결제</span>');
+        : s.form === 'Perpetual'
+          ? `<span class="empty-loc">영구</span>`
+          : (escapeHtml(s.expireDate) || '<span class="empty-loc">자동결제</span>');
     const usersDisplay = (s.users && s.users.length > 0)
       ? s.users.map(u => `<span style="display:inline-block;background:var(--tag-bg,#e8f0e8);color:var(--tag-text,#2f5d50);border-radius:4px;padding:1px 6px;font-size:11px;margin:1px;">${escapeHtml(u)}</span>`).join(' ')
       : (escapeHtml(s.user) || '<span class="empty-loc">미지정</span>');
@@ -1406,9 +1410,12 @@ function parseSwSheetData(sheetData) {
       if (serial) note = [note, serial.length > 40 ? '' : `SN:${serial}`].filter(Boolean).join(' · ');
 
       // 알림 유형 추정 (수동 지정 필드가 없어서 사용자 수/계정 형태로 추정)
-      let alertType = 'admin';
-      if (users.length === 1) alertType = 'personal';
-      else if (users.length >= 2) alertType = 'dual';
+      // 영구라이선스는 만료 개념이 없어 알림 대상에서 제외
+      let alertType = cfg.perpetual ? 'none' : 'admin';
+      if (!cfg.perpetual) {
+        if (users.length === 1) alertType = 'personal';
+        else if (users.length >= 2) alertType = 'dual';
+      }
 
       result.push({
         id: `sw_${tabName}_${i}`.replace(/\s+/g, ''), // 탭+행번호 기반 고정 ID (재동기화해도 안 바뀜)
