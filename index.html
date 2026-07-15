@@ -281,7 +281,6 @@ tbody tr:last-child td { border-bottom: none; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .row2, .row3 { grid-template-columns: 1fr; }
 }
-
 </style>
 </head>
 <body>
@@ -415,7 +414,7 @@ tbody tr:last-child td { border-bottom: none; }
           <div class="chart-wrap tall"><canvas id="chart-yearly"></canvas></div>
         </div>
         <div class="chart-card">
-          <div class="chart-title">사용기간 분포 (사용중)</div>
+          <div class="chart-title">자산명별 분포</div>
           <div class="chart-wrap"><canvas id="chart-age"></canvas></div>
         </div>
       </div>
@@ -641,6 +640,7 @@ tbody tr:last-child td { border-bottom: none; }
           <option value="Autodesk">Autodesk</option>
           <option value="AI Tool">AI Tool</option>
           <option value="구독서비스">구독서비스</option>
+          <option value="영구라이선스">영구라이선스</option>
         </select>
         <select class="select-filter" id="sw-filter-alert" onchange="renderSwList()">
           <option value="">전체 알림유형</option>
@@ -668,6 +668,7 @@ tbody tr:last-child td { border-bottom: none; }
             <thead>
               <tr>
                 <th>제품명</th>
+                <th>계정</th>
                 <th>사용자</th>
                 <th>결제형태</th>
                 <th>만료일</th>
@@ -791,16 +792,3895 @@ tbody tr:last-child td { border-bottom: none; }
     </section>
 
   </main>
-</div>
-
-
-
+<script>
+const SEED_SW = [
+  {
+    "id": "sw1",
+    "tab": "AI Tool",
+    "cat": "기획 AI",
+    "name": "Claude Claude Pro",
+    "account": "ga@111percent.net",
+    "users": [
+      "쿤"
+    ],
+    "startDate": "2025-05-21",
+    "expireDate": "-",
+    "form": "Monthly",
+    "price": 22.0,
+    "currency": "KRW",
+    "note": "Visa •••• 1417"
+  },
+  {
+    "id": "sw2",
+    "tab": "AI Tool",
+    "cat": "기획 AI",
+    "name": "Claude Max",
+    "account": "ga_2@111percent.net",
+    "users": [
+      "닉"
+    ],
+    "startDate": "2026-02-03",
+    "expireDate": "-",
+    "form": "Monthly",
+    "price": 220.0,
+    "currency": "USD",
+    "note": "Visa •••• 1417"
+  },
+  {
+    "id": "sw3",
+    "tab": "AI Tool",
+    "cat": "기획 AI",
+    "name": "Open AI Open AI",
+    "account": "openai@111percent.net",
+    "users": [
+      "피터"
+    ],
+    "startDate": "2025-06-05",
+    "expireDate": "-",
+    "form": "Monthly",
+    "price": 0,
+    "currency": "KRW",
+    "note": "Visa •••• 1417"
+  },
+  {
+    "id": "sw4",
+    "tab": "AI Tool",
+    "cat": "AI 코딩",
+    "name": "Cursor Cursor AI Pro (1년)",
+    "account": "ga@111percent.net",
+    "users": [
+      "한구"
+    ],
+    "startDate": "-",
+    "expireDate": "2027-01-03",
+    "form": "Annual",
+    "price": 192.0,
+    "currency": "KRW",
+    "note": "233(Amax 롯데)"
+  },
+  {
+    "id": "sw5",
+    "tab": "AI Tool",
+    "cat": "AI 이미지 및 비디오",
+    "name": "Midjourney Inc Midjourney",
+    "account": "incrater@111percent.net",
+    "users": [
+      "우디"
+    ],
+    "startDate": "-",
+    "expireDate": "2026-07-17",
+    "form": "Annual",
+    "price": 316.8,
+    "currency": "KRW",
+    "note": "Visa •••• 1417"
+  },
+  {
+    "id": "sw6",
+    "tab": "AI Tool",
+    "cat": "AI 이미지 및 비디오",
+    "name": "Kling AI Kling AI Pro",
+    "account": "public_sw@111percent.net",
+    "users": [
+      "버드"
+    ],
+    "startDate": "-",
+    "expireDate": "2026-08-04",
+    "form": "Annual",
+    "price": 293.04,
+    "currency": "USD",
+    "note": "Visa •••• 1417"
+  },
+  {
+    "id": "sw7",
+    "tab": "AI Tool",
+    "cat": "AI 이미지 및 비디오",
+    "name": "higgsfield AI higgsfield AI",
+    "account": "public_sw1@111percent.net / Wntkdnl1!",
+    "users": [
+      "쿤, 슬로안"
+    ],
+    "startDate": "2026-01-06",
+    "expireDate": "-",
+    "form": "Monthly",
+    "price": 150.0,
+    "currency": "KRW",
+    "note": "Visa •••• 1417"
+  },
+  {
+    "id": "sw8",
+    "tab": "AI Tool",
+    "cat": "AI 음성 및 음악 생성",
+    "name": "11ElevenLabs 11ElevenLabs - Creater",
+    "account": "ga_2@111percent.net",
+    "users": [
+      "버드"
+    ],
+    "startDate": "2026-01-09",
+    "expireDate": "-",
+    "form": "Monthly",
+    "price": 24.2,
+    "currency": "USD",
+    "note": "Visa •••• 1417"
+  },
+  {
+    "id": "sw9",
+    "tab": "AI Tool",
+    "cat": "AI 음성 및 음악 생성",
+    "name": "typecast 비즈니스 플랜",
+    "account": "admgr@111percent.net",
+    "users": [
+      "마케팅공용계정(쌤)"
+    ],
+    "startDate": "2022-04-11",
+    "expireDate": "-",
+    "form": "Monthly",
+    "price": 119000.0,
+    "currency": "KRW",
+    "note": "Visa •••• 1417"
+  },
+  {
+    "id": "sw10",
+    "tab": "AI Tool",
+    "cat": "AI 음성 및 음악 생성",
+    "name": "SUNO SUNO AI Pro",
+    "account": "suno_111percent@111percent.net",
+    "users": [
+      "호세(사운드)"
+    ],
+    "startDate": "2026-01-17",
+    "expireDate": "-",
+    "form": "Monthly",
+    "price": 30.0,
+    "currency": "KRW",
+    "note": "Visa •••• 1417"
+  },
+  {
+    "id": "sw11",
+    "tab": "JetBrains",
+    "cat": "JetBrains",
+    "name": "JetBrains Rider",
+    "account": "wade@111percent.net",
+    "users": [
+      "웨이드"
+    ],
+    "startDate": "",
+    "expireDate": "2026-08-03",
+    "form": "Annual",
+    "price": 361500.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw12",
+    "tab": "JetBrains",
+    "cat": "JetBrains",
+    "name": "JetBrains Datagrip",
+    "account": "momo@111percent.net",
+    "users": [
+      "모모"
+    ],
+    "startDate": "",
+    "expireDate": "2026-08-03",
+    "form": "Annual",
+    "price": 320000.0,
+    "currency": "KRW",
+    "note": "25-07-28 ~"
+  },
+  {
+    "id": "sw13",
+    "tab": "JetBrains",
+    "cat": "JetBrains",
+    "name": "JetBrains IntelliJ IDEA Ultimate",
+    "account": "craig@111percent.net",
+    "users": [
+      "크레이그"
+    ],
+    "startDate": "",
+    "expireDate": "2026-08-03",
+    "form": "Annual",
+    "price": 676000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw14",
+    "tab": "구독서비스",
+    "cat": "postman",
+    "name": "postman Basic",
+    "account": "ga@111percent.net",
+    "users": [
+      "리트"
+    ],
+    "startDate": "",
+    "expireDate": "2027-02-23",
+    "form": "Annual",
+    "price": 117600.0,
+    "currency": "KRW",
+    "note": "Visa •••• 1417"
+  },
+  {
+    "id": "sw15",
+    "tab": "구독서비스",
+    "cat": "postman",
+    "name": "postman",
+    "account": "ricky@111percent.net",
+    "users": [
+      "리키"
+    ],
+    "startDate": "",
+    "expireDate": "2027-02-23",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw16",
+    "tab": "구독서비스",
+    "cat": "postman",
+    "name": "postman",
+    "account": "nick@111percent.net",
+    "users": [
+      "닉"
+    ],
+    "startDate": "",
+    "expireDate": "2027-02-23",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw17",
+    "tab": "구독서비스",
+    "cat": "postman",
+    "name": "postman",
+    "account": "jalen@111percent.net",
+    "users": [
+      "제일런"
+    ],
+    "startDate": "",
+    "expireDate": "2027-02-23",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw18",
+    "tab": "구독서비스",
+    "cat": "postman",
+    "name": "postman",
+    "account": "jacob@111percent.net",
+    "users": [
+      "제이콥"
+    ],
+    "startDate": "",
+    "expireDate": "2027-02-23",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw19",
+    "tab": "구독서비스",
+    "cat": "postman",
+    "name": "postman Flows",
+    "account": "craig@111percent.net",
+    "users": [
+      "크레이그"
+    ],
+    "startDate": "",
+    "expireDate": "2027-02-23",
+    "form": "Annual",
+    "price": 144.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw20",
+    "tab": "구독서비스",
+    "cat": "Docker",
+    "name": "Docker Docker Pro",
+    "account": "ga_unity_001@111percent.net",
+    "users": [
+      "아바투르"
+    ],
+    "startDate": "",
+    "expireDate": "2026-10-16",
+    "form": "Annual",
+    "price": 108.0,
+    "currency": "KRW",
+    "note": "Visa •••• 1417"
+  },
+  {
+    "id": "sw21",
+    "tab": "구독서비스",
+    "cat": "Docker",
+    "name": "Docker",
+    "account": "ga_unity_002@111percent.net",
+    "users": [
+      "닉"
+    ],
+    "startDate": "",
+    "expireDate": "2026-10-16",
+    "form": "Annual",
+    "price": 108.0,
+    "currency": "KRW",
+    "note": "Visa •••• 1417"
+  },
+  {
+    "id": "sw22",
+    "tab": "구독서비스",
+    "cat": "Docker",
+    "name": "Docker",
+    "account": "ga_unity_003@111percent.net",
+    "users": [
+      "요다"
+    ],
+    "startDate": "",
+    "expireDate": "2026-10-16",
+    "form": "Annual",
+    "price": 108.0,
+    "currency": "KRW",
+    "note": "Visa •••• 1417"
+  },
+  {
+    "id": "sw23",
+    "tab": "구독서비스",
+    "cat": "Esoteric Software",
+    "name": "Esoteric Software Spine",
+    "account": "9797040i2i224g9v9519v1i67hv9945i",
+    "users": [
+      "클로버"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-08",
+    "form": "Annual",
+    "price": 2499.0,
+    "currency": "KRW",
+    "note": "Enterprise 연 $2499 발생"
+  },
+  {
+    "id": "sw24",
+    "tab": "구독서비스",
+    "cat": "Midjourney Inc",
+    "name": "Midjourney Inc Midjourney",
+    "account": "incrater@111percent.net",
+    "users": [
+      "우디"
+    ],
+    "startDate": "",
+    "expireDate": "2025-07-17",
+    "form": "Annual",
+    "price": 316.8,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw25",
+    "tab": "구독서비스",
+    "cat": "MAXON",
+    "name": "MAXON cinema4D",
+    "account": "111-DK",
+    "users": [
+      "디케이"
+    ],
+    "startDate": "",
+    "expireDate": "2025-04-02",
+    "form": "Annual",
+    "price": 890000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw26",
+    "tab": "구독서비스",
+    "cat": "MAXON",
+    "name": "MAXON Maxon One",
+    "account": "111-BIRD",
+    "users": [
+      "버드"
+    ],
+    "startDate": "",
+    "expireDate": "2027-04-02",
+    "form": "Annual",
+    "price": 1800000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw27",
+    "tab": "구독서비스",
+    "cat": "MAXON",
+    "name": "MAXON",
+    "account": "111-KUN",
+    "users": [
+      "쿤"
+    ],
+    "startDate": "",
+    "expireDate": "2027-04-02",
+    "form": "",
+    "price": 1800000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw28",
+    "tab": "구독서비스",
+    "cat": "envatoMarket",
+    "name": "envatoMarket Elements Teams",
+    "account": "sound@111percent.net",
+    "users": [
+      "소유주"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-04",
+    "form": "Annual",
+    "price": 645.0,
+    "currency": "KRW",
+    "note": "쿤님 사용중"
+  },
+  {
+    "id": "sw29",
+    "tab": "구독서비스",
+    "cat": "envatoMarket",
+    "name": "envatoMarket",
+    "account": "sloan@111percent.net",
+    "users": [
+      "슬로안"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-04",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw30",
+    "tab": "구독서비스",
+    "cat": "envatoMarket",
+    "name": "envatoMarket",
+    "account": "eve@111percent.net",
+    "users": [
+      "이브"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-04",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw31",
+    "tab": "구독서비스",
+    "cat": "envatoMarket",
+    "name": "envatoMarket",
+    "account": "sarah@111percent.net",
+    "users": [
+      "세라"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-04",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw32",
+    "tab": "구독서비스",
+    "cat": "envatoMarket",
+    "name": "envatoMarket",
+    "account": "levi@111percent.net",
+    "users": [
+      "레비"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-04",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw33",
+    "tab": "구독서비스",
+    "cat": "envatoMarket",
+    "name": "envatoMarket",
+    "account": "ga@111percent.net",
+    "users": [
+      "글렌"
+    ],
+    "startDate": "",
+    "expireDate": "2026-06-18",
+    "form": "Annual",
+    "price": 645.0,
+    "currency": "KRW",
+    "note": "ZZOO팀 5명 사용"
+  },
+  {
+    "id": "sw34",
+    "tab": "구독서비스",
+    "cat": "산돌폰트",
+    "name": "산돌폰트 HG꼬딕씨",
+    "account": "incrater@111percent.net",
+    "users": [
+      "덤프트럭 레이블"
+    ],
+    "startDate": "",
+    "expireDate": "2026-05-28",
+    "form": "Monthly",
+    "price": 11000.0,
+    "currency": "KRW",
+    "note": "Visa •••• 1417"
+  },
+  {
+    "id": "sw35",
+    "tab": "구독서비스",
+    "cat": "산돌폰트",
+    "name": "산돌폰트 아픽 베이직",
+    "account": "incrater@111percent.net",
+    "users": [
+      "구스레이블"
+    ],
+    "startDate": "",
+    "expireDate": "2026-05-28",
+    "form": "Monthly",
+    "price": 22000.0,
+    "currency": "KRW",
+    "note": "Visa •••• 1417"
+  },
+  {
+    "id": "sw36",
+    "tab": "구독서비스",
+    "cat": "Figma",
+    "name": "Figma Figma",
+    "account": "ludo@111percent.net",
+    "users": [
+      "루도"
+    ],
+    "startDate": "",
+    "expireDate": "2026-07-25",
+    "form": "Annual",
+    "price": 211.2,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw37",
+    "tab": "구독서비스",
+    "cat": "MemoQ",
+    "name": "MemoQ memoQ translator pro",
+    "account": "SUBSW-XCFIS-WQ5XM-71F9E",
+    "users": [],
+    "startDate": "",
+    "expireDate": "2026-09-19",
+    "form": "Annual",
+    "price": 400.0,
+    "currency": "KRW",
+    "note": "233(Amax 롯데)"
+  },
+  {
+    "id": "sw38",
+    "tab": "구독서비스",
+    "cat": "MemoQ",
+    "name": "MemoQ",
+    "account": "SUBS3-AI9H9-DA64L-8DA84",
+    "users": [
+      "츠키"
+    ],
+    "startDate": "",
+    "expireDate": "2026-09-19",
+    "form": "Annual",
+    "price": 400.0,
+    "currency": "KRW",
+    "note": "233(Amax 롯데)"
+  },
+  {
+    "id": "sw39",
+    "tab": "구독서비스",
+    "cat": "MemoQ",
+    "name": "MemoQ",
+    "account": "SUBSJ-VL0NU-8857W-C378C",
+    "users": [
+      "푸린"
+    ],
+    "startDate": "",
+    "expireDate": "2026-09-19",
+    "form": "Annual",
+    "price": 400.0,
+    "currency": "KRW",
+    "note": "233(Amax 롯데)"
+  },
+  {
+    "id": "sw40",
+    "tab": "구독서비스",
+    "cat": "(주)플러스플라스틱",
+    "name": "(주)플러스플라스틱 Keyshot Studio (1년)",
+    "account": "SUKP-KXYF-WTMB-KXQ6-E5DU",
+    "users": [],
+    "startDate": "",
+    "expireDate": "2025-01-01",
+    "form": "Annual",
+    "price": 1485000.0,
+    "currency": "KRW",
+    "note": "233(Amax 롯데)"
+  },
+  {
+    "id": "sw41",
+    "tab": "구독서비스",
+    "cat": "Cursor",
+    "name": "Cursor Cursor AI Pro (1년)",
+    "account": "ga@111percent.net",
+    "users": [
+      "한구"
+    ],
+    "startDate": "",
+    "expireDate": "2026-01-03",
+    "form": "Annual",
+    "price": 192.0,
+    "currency": "KRW",
+    "note": "233(Amax 롯데)"
+  },
+  {
+    "id": "sw42",
+    "tab": "구독서비스",
+    "cat": "Kling AI",
+    "name": "Kling AI Kling AI Pro",
+    "account": "public_sw@111percent.net",
+    "users": [
+      "버드"
+    ],
+    "startDate": "",
+    "expireDate": "2026-08-04",
+    "form": "Annual",
+    "price": 293.04,
+    "currency": "USD",
+    "note": "Visa •••• 1417"
+  },
+  {
+    "id": "sw43",
+    "tab": "구독서비스",
+    "cat": "Miricanvas",
+    "name": "Miricanvas Miricanvas Pro",
+    "account": "ga@111percent.net",
+    "users": [
+      "카야"
+    ],
+    "startDate": "",
+    "expireDate": "2027-04-28",
+    "form": "Annual",
+    "price": 160800.0,
+    "currency": "KRW",
+    "note": "Visa •••• 1417"
+  },
+  {
+    "id": "sw44",
+    "tab": "구독서비스",
+    "cat": "Mobbin",
+    "name": "Mobbin Mobbin Team Seat",
+    "account": "ga@111percent.net",
+    "users": [
+      "크레이그"
+    ],
+    "startDate": "2026-05-28",
+    "expireDate": "2027-05-27",
+    "form": "Annual",
+    "price": 403200.0,
+    "currency": "KRW",
+    "note": "Visa •••• 1417"
+  },
+  {
+    "id": "sw45",
+    "tab": "구독서비스",
+    "cat": "Surfshark",
+    "name": "Surfshark Surfshark One",
+    "account": "ga@111percent.net",
+    "users": [
+      "곤"
+    ],
+    "startDate": "2026-06-15",
+    "expireDate": "2028-06-15",
+    "form": "Annual",
+    "price": 121770.0,
+    "currency": "KRW",
+    "note": "233(Amax 롯데)"
+  },
+  {
+    "id": "sw46",
+    "tab": "구독서비스",
+    "cat": "CapCut",
+    "name": "CapCut CapCut Pro",
+    "account": "community@offmoon.net",
+    "users": [
+      "소니아"
+    ],
+    "startDate": "2026-06-18",
+    "expireDate": "2028-06-18",
+    "form": "Annual",
+    "price": 178000.0,
+    "currency": "KRW",
+    "note": "Visa •••• 1417"
+  },
+  {
+    "id": "sw47",
+    "tab": "전사 공통 Saas",
+    "cat": "공통 Saas",
+    "name": "NOTION",
+    "account": "",
+    "users": [],
+    "startDate": "",
+    "expireDate": "2026-07-08",
+    "form": "Annual",
+    "price": 19457.37,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw48",
+    "tab": "전사 공통 Saas",
+    "cat": "공통 Saas",
+    "name": "Slack",
+    "account": "",
+    "users": [],
+    "startDate": "",
+    "expireDate": "2026-08-08",
+    "form": "Annual",
+    "price": 11310.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw49",
+    "tab": "전사 공통 Saas",
+    "cat": "공통 Saas",
+    "name": "Flex",
+    "account": "",
+    "users": [],
+    "startDate": "",
+    "expireDate": "매월 말일",
+    "form": "Monthly",
+    "price": 1900000.0,
+    "currency": "KRW",
+    "note": "2024-09 업데이트 기준"
+  },
+  {
+    "id": "sw50",
+    "tab": "전사 공통 Saas",
+    "cat": "공통 Saas",
+    "name": "GWS",
+    "account": "",
+    "users": [],
+    "startDate": "",
+    "expireDate": "매월 말일",
+    "form": "Monthly",
+    "price": 3487.5,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw51",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_001@111percent.net",
+    "users": [
+      "세라",
+      "칼리"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw52",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_002@111percent.net",
+    "users": [
+      "우디",
+      "제임스"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw53",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_004@111percent.net",
+    "users": [
+      "아이비",
+      "봄봄"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw54",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_005@111percent.net",
+    "users": [
+      "루이스",
+      "안도"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw55",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_006@111percent.net",
+    "users": [
+      "클로버",
+      "티미"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw56",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_007@111percent.net",
+    "users": [
+      "버드",
+      "쏘"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw57",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_008@111percent.net",
+    "users": [
+      "나쵸",
+      "디딧"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw58",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_009@111percent.net",
+    "users": [
+      "글렌",
+      "켄"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": "쭈법인"
+  },
+  {
+    "id": "sw59",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_010@111percent.net",
+    "users": [
+      "뇽",
+      "주디"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw60",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_011@111percent.net",
+    "users": [
+      "줄리",
+      "밤바"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw61",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_012@111percent.net",
+    "users": [
+      "피비",
+      "채채"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw62",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_014@111percent.net",
+    "users": [
+      "위즐",
+      "레이"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw63",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_015@111percent.net",
+    "users": [
+      "미카",
+      "훈"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw64",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_017@111percent.net",
+    "users": [
+      "페퍼",
+      "씨제이"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw65",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_018@111percent.net",
+    "users": [
+      "멜리",
+      "클라라"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw66",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_019@111percent.net",
+    "users": [
+      "루마",
+      "구기"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw67",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_030@111percent.net",
+    "users": [
+      "산타"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw68",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_031@111percent.net",
+    "users": [
+      "니모",
+      "에밀리"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw69",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_022@111percent.net",
+    "users": [
+      "누누",
+      "누누"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": "쭈 법인"
+  },
+  {
+    "id": "sw70",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_025@111percent.net",
+    "users": [
+      "히포",
+      "제제"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw71",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_028@111percent.net",
+    "users": [
+      "세나",
+      "쿠엔틴"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw72",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_029@111percent.net",
+    "users": [
+      "슬로안",
+      "쿤"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw73",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_035@111percent.net",
+    "users": [
+      "패트",
+      "이브"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw74",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_036@111percent.net",
+    "users": [
+      "제시",
+      "레비"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw75",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_037@111percent.net",
+    "users": [
+      "레지나",
+      "언블로"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw76",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_038@111percent.net",
+    "users": [
+      "홀든",
+      "버즈"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw77",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_039@111percent.net",
+    "users": [
+      "라킹",
+      "듀란"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw78",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_032@111percent.net",
+    "users": [
+      "미니",
+      "까누"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw79",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_033@111percent.net",
+    "users": [
+      "리프",
+      "베니"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw80",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_044@111percent.net",
+    "users": [
+      "샤아",
+      "알토"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw81",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_045@111percent.net",
+    "users": [
+      "시안",
+      "도치"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw82",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_046@111percent.net",
+    "users": [
+      "오리",
+      "오리"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": "쭈 법인"
+  },
+  {
+    "id": "sw83",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_047@111percent.net",
+    "users": [
+      "피오",
+      "핑핑"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw84",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_048@111percent.net",
+    "users": [
+      "제이",
+      "윌슨"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw85",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_050@111percent.net",
+    "users": [
+      "테이",
+      "센시"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw86",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_056@111percent.net",
+    "users": [
+      "지나",
+      "곤"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1205000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw87",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_057@111percent.net",
+    "users": [
+      "토리",
+      "그린"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1112000.0,
+    "currency": "KRW",
+    "note": "260622 ~"
+  },
+  {
+    "id": "sw88",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_059@111percent.net",
+    "users": [
+      "코지",
+      "슈리"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1099400.0,
+    "currency": "KRW",
+    "note": "260625 ~"
+  },
+  {
+    "id": "sw89",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Creative Cloud",
+    "account": "ga_cc_060@111percent.net",
+    "users": [],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1043300.0,
+    "currency": "KRW",
+    "note": "260713 ~"
+  },
+  {
+    "id": "sw90",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Photoshop",
+    "account": "ga_cc_013@111percent.net",
+    "users": [
+      "벤",
+      "무무"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 510000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw91",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Photoshop",
+    "account": "ga_cc_020@111percent.net",
+    "users": [
+      "원더",
+      "헤일렌"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 510000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw92",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Photoshop",
+    "account": "ga_cc_021@111percent.net",
+    "users": [
+      "두부",
+      "소니아"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 510000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw93",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Photoshop",
+    "account": "ga_cc_023@111percent.net",
+    "users": [
+      "맥스",
+      "카프카"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 510000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw94",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Photoshop",
+    "account": "ga_cc_024@111percent.net",
+    "users": [
+      "로웬",
+      "여니"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 510000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw95",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Photoshop",
+    "account": "ga_cc_026@111percent.net",
+    "users": [
+      "늘보",
+      "파즈"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 510000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw96",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Photoshop",
+    "account": "ga_cc_027@111percent.net",
+    "users": [
+      "올리",
+      "제리"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 510000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw97",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Photoshop",
+    "account": "ga_cc_051@111percent.net",
+    "users": [
+      "큐온"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 510000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw98",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Photoshop",
+    "account": "ga_cc_052@111percent.net",
+    "users": [
+      "까까"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 510000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw99",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Photoshop",
+    "account": "ga_cc_053@111percent.net",
+    "users": [
+      "헨디"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 510000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw100",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Photoshop",
+    "account": "ga_cc_054@111percent.net",
+    "users": [
+      "도리",
+      "기린"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 510000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw101",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Photoshop",
+    "account": "ga_cc_058@111percent.net",
+    "users": [
+      "자유"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 470000.0,
+    "currency": "KRW",
+    "note": "260622 ~"
+  },
+  {
+    "id": "sw102",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Acrobat Pro",
+    "account": "ga_cc_016@111percent.net",
+    "users": [
+      "케일",
+      "지아"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 430000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw103",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Acrobat Pro",
+    "account": "ga_cc_040@111percent.net",
+    "users": [
+      "베이",
+      "리즈"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 430000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw104",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Acrobat Pro",
+    "account": "ga_cc_041@111percent.net",
+    "users": [
+      "루비",
+      "액스"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 430000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw105",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Acrobat Pro",
+    "account": "ga_cc_034@111percent.net",
+    "users": [
+      "법사",
+      "커비"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 430000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw106",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Acrobat Pro",
+    "account": "ga_cc_049@111percent.net",
+    "users": [
+      "한영",
+      "닐스"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 430000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw107",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Substance 3D",
+    "account": "ga_cc_033@111percent.net",
+    "users": [
+      "캐피",
+      "베니"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1440000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw108",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Substance 3D",
+    "account": "ga_cc_055@111percent.net",
+    "users": [
+      "구기",
+      "루이스"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1440000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw109",
+    "tab": "Adobe",
+    "cat": "Adobe",
+    "name": "Adobe Substance 3D",
+    "account": "ga_cc_061@111percent.net",
+    "users": [
+      "토리"
+    ],
+    "startDate": "",
+    "expireDate": "2027-05-24",
+    "form": "Annual",
+    "price": 1242800.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw110",
+    "tab": "MS",
+    "cat": "MS",
+    "name": "MS",
+    "account": "incrater2@111percent.onmicrosoft.com",
+    "users": [
+      "토니",
+      "법사",
+      "한영",
+      "폴리"
+    ],
+    "startDate": "",
+    "expireDate": "2026-11-16",
+    "form": "Annual",
+    "price": 100000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw111",
+    "tab": "MS",
+    "cat": "MS",
+    "name": "MS",
+    "account": "111percent4@111percent.onmicrosoft.com",
+    "users": [
+      "시온",
+      "루카",
+      "쿤",
+      "키마",
+      "패트",
+      "심바",
+      "호제아"
+    ],
+    "startDate": "",
+    "expireDate": "2026-11-16",
+    "form": "Annual",
+    "price": 100000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw112",
+    "tab": "MS",
+    "cat": "MS",
+    "name": "MS",
+    "account": "111percent5@111percent.onmicrosoft.com",
+    "users": [
+      "푸린",
+      "에단",
+      "랜드",
+      "티노",
+      "부기",
+      "옐",
+      "블랑"
+    ],
+    "startDate": "",
+    "expireDate": "2026-11-16",
+    "form": "Annual",
+    "price": 100000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw113",
+    "tab": "MS",
+    "cat": "MS",
+    "name": "MS",
+    "account": "111percent6@111percent.onmicrosoft.com",
+    "users": [
+      "쌤",
+      "리셉션",
+      "애덤",
+      "리제",
+      "루도",
+      "메건",
+      "라니"
+    ],
+    "startDate": "",
+    "expireDate": "2026-11-16",
+    "form": "Annual",
+    "price": 100000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw114",
+    "tab": "MS",
+    "cat": "MS",
+    "name": "MS",
+    "account": "111percent7@111percent.onmicrosoft.com",
+    "users": [
+      "록시",
+      "커비",
+      "스윔",
+      "츠키",
+      "여니",
+      "달리",
+      "베라"
+    ],
+    "startDate": "",
+    "expireDate": "2026-11-16",
+    "form": "Annual",
+    "price": 100000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw115",
+    "tab": "MS",
+    "cat": "MS",
+    "name": "MS",
+    "account": "111percent8@111percent.onmicrosoft.com",
+    "users": [
+      "벤",
+      "봄봄",
+      "지나",
+      "도나",
+      "레지나",
+      "헬레나",
+      "소리"
+    ],
+    "startDate": "",
+    "expireDate": "2026-11-16",
+    "form": "Annual",
+    "price": 100000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw116",
+    "tab": "MS",
+    "cat": "MS",
+    "name": "MS",
+    "account": "111percent9@111percent.onmicrosoft.com",
+    "users": [
+      "토르",
+      "제시(임시)",
+      "리키",
+      "로웬",
+      "카야",
+      "단테",
+      "로잘린"
+    ],
+    "startDate": "",
+    "expireDate": "2026-11-16",
+    "form": "Annual",
+    "price": 100000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw117",
+    "tab": "MS",
+    "cat": "MS",
+    "name": "MS",
+    "account": "111percent10@111percent.onmicrosoft.com",
+    "users": [
+      "케일",
+      "지아",
+      "멜리",
+      "레비",
+      "지투",
+      "닐스",
+      "코니"
+    ],
+    "startDate": "",
+    "expireDate": "2026-11-16",
+    "form": "Annual",
+    "price": 100000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw118",
+    "tab": "MS",
+    "cat": "MS",
+    "name": "MS MS 365 Business Standard",
+    "account": "111percent11@111percent.onmicrosoft.com",
+    "users": [
+      "베이",
+      "리즈",
+      "릴리",
+      "쿠엔틴",
+      "루비",
+      "액스"
+    ],
+    "startDate": "",
+    "expireDate": "2026-11-16",
+    "form": "Annual",
+    "price": 100000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw119",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Unity Ent.",
+    "account": "build_com@111percent.net",
+    "serialKey": "SC-4GCE-UYPQ-TCJ9-F6Y3-YPDS",
+    "users": [
+      "빌드"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": "게임베이스"
+  },
+  {
+    "id": "sw120",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "build_unity1@111percent.net",
+    "serialKey": "SC-K73E-33ZQ-PCEV-K59A-C4SH",
+    "users": [
+      "빌드"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": "게임베이스"
+  },
+  {
+    "id": "sw121",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "build_unity2@111percent.net",
+    "serialKey": "SC-SJQY-43KY-HS2P-Y25R-765J",
+    "users": [
+      "빌드"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": "게임베이스"
+  },
+  {
+    "id": "sw122",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_001@111percent.net",
+    "serialKey": "SC-3H3E-YVZ4-2MFP-ZJXM-UYGH",
+    "users": [
+      "한구",
+      "지투"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw123",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_002@111percent.net",
+    "serialKey": "SC-H8VZ-UDHU-4PFB-29M9-HRRE",
+    "users": [
+      "케이건",
+      "루이스"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw124",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_003@111percent.net",
+    "serialKey": "SC-7ASK-GBMK-YMJ4-96N7-TQ3T",
+    "users": [
+      "레아",
+      "세나"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw125",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_004@111percent.net",
+    "serialKey": "SC-H9EC-VBNP-5PKK-Z62P-7T6D",
+    "users": [
+      "리틀",
+      "지오"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw126",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_005@111percent.net",
+    "serialKey": "SC-KKVD-AXWY-RQQS-SHZZ-FB2J",
+    "users": [
+      "버거",
+      "호세"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw127",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_006@111percent.net",
+    "serialKey": "SC-8M7X-3FYX-HMUK-REQR-Q4Q3",
+    "users": [
+      "카터",
+      "SF빌드"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw128",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_007@111percent.net",
+    "serialKey": "SC-C6QC-7PTF-EMVV-64S8-4EAA",
+    "users": [
+      "베니",
+      "세라"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw129",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_008@111percent.net",
+    "serialKey": "SC-ZTUN-DFCG-H4PW-BRGE-A36H",
+    "users": [
+      "방망",
+      "챈들러"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw130",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_009@111percent.net",
+    "serialKey": "SC-MSHY-DWP9-4YP8-8UD7-DT35",
+    "users": [
+      "단델",
+      "테스"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw131",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_010@111percent.net",
+    "serialKey": "SC-4XXB-U2NG-CY2J-BUNW-QQFE",
+    "users": [
+      "닉"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw132",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_011@111percent.net",
+    "serialKey": "SC-NT9H-X2NM-VEVA-5M2T-53PJ",
+    "users": [
+      "기술지원팀",
+      "헤일렌"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw133",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_012@111percent.net",
+    "serialKey": "SC-9MR4-JSYE-BM4K-W5ST-73H9",
+    "users": [
+      "빌드(제이케이)",
+      "레이"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw134",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_014@111percent.net",
+    "serialKey": "SC-VXTR-SZQK-AMTK-2CPZ-HA2Q",
+    "users": [
+      "토비",
+      "라킹"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw135",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_015@111percent.net",
+    "serialKey": "SC-MQAU-DCXF-ZKST-JT4T-9R9T",
+    "users": [
+      "빌드(제이케이)",
+      "바로"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw136",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_016@111percent.net",
+    "serialKey": "SC-YUKK-QSMY-MH74-P876-GKWM",
+    "users": [
+      "빌드(제이케이)",
+      "씨제이"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw137",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_017@111percent.net",
+    "serialKey": "SC-9EJF-CRWX-E4QC-XZRP-YWY9",
+    "users": [
+      "판다",
+      "스윔"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw138",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_018@111percent.net",
+    "serialKey": "SC-KBED-DECG-QSD9-TNZB-E66Z",
+    "users": [
+      "페더",
+      "우디"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw139",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_019@111percent.net",
+    "serialKey": "SC-CPMR-8CM3-UP67-6433-X74M",
+    "users": [
+      "티미",
+      "닥페"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw140",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_020@111percent.net",
+    "serialKey": "SC-CWYB-AG7D-H7XE-XDYW-FH8J",
+    "users": [
+      "채드",
+      "봄봄"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw141",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_021@111percent.net",
+    "serialKey": "SC-E79B-F3QP-468J-W55Y-QFRV",
+    "users": [
+      "제시",
+      "채채"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw142",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_022@111percent.net",
+    "serialKey": "SC-3S2U-7YSD-8U3D-DF7C-6ZJ3",
+    "users": [
+      "루크",
+      "주디"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw143",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_023@111percent.net",
+    "serialKey": "SC-CTWQ-4XPX-DY7V-BZM2-YUEK",
+    "users": [
+      "웨이드",
+      "랜드"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw144",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_024@111percent.net",
+    "serialKey": "SC-DYY5-9EKU-7ST6-VNMS-M74T",
+    "users": [
+      "빌드(제이케이)",
+      "두부"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw145",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_025@111percent.net",
+    "serialKey": "SC-477X-C4MR-MMY5-6A9V-TTU4",
+    "users": [
+      "파즈",
+      "로비"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw146",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_026@111percent.net",
+    "serialKey": "SC-KF2V-9HJR-R8TN-VG7Q-J4RW",
+    "users": [
+      "제임스",
+      "이브"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw147",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_027@111percent.net",
+    "serialKey": "SC-S4RK-K3HE-BUCC-BHMB-4TKX",
+    "users": [
+      "릴라드",
+      "클로버"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw148",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_028@111percent.net",
+    "serialKey": "SC-T2MM-YKGV-28TA-4B9K-4FUN",
+    "users": [
+      "요다",
+      "훈"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw149",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_029@111percent.net",
+    "serialKey": "SC-Z3F5-53QV-5MMC-3F9T-2W6B",
+    "users": [
+      "구기",
+      "제프"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw150",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_030@111percent.net",
+    "serialKey": "SC-AGTW-7Y8J-28BP-WPKJ-3PS5",
+    "users": [
+      "에린",
+      "아르센"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw151",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_032@111percent.net",
+    "serialKey": "SC-GVX5-C4T6-XXQE-XJER-CY3M",
+    "users": [
+      "기린",
+      "콩"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw152",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_033@111percent.net",
+    "serialKey": "SC-WEQS-REGX-UJYV-2B9C-59UM",
+    "users": [
+      "빌드 (제이케이)",
+      "세화"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw153",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_034@111percent.net",
+    "serialKey": "SC-ACUH-S4J4-CEBC-U895-YUAU",
+    "users": [
+      "아바투르",
+      "게임베이스공용"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw154",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_035@111percent.net",
+    "serialKey": "SC-TVXT-8WN2-SPYA-RADP-VMR6",
+    "users": [
+      "리트",
+      "조슈아"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw155",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_036@111percent.net",
+    "serialKey": "SC-98FA-TP9H-TYPF-QE5W-UGYA",
+    "users": [
+      "패트",
+      "컨티뉴"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw156",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_037@111percent.net",
+    "serialKey": "SC-KPRP-SCAB-7QRY-WQ2C-3HCA",
+    "users": [
+      "이공"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw157",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_038@111percent.net",
+    "serialKey": "SC-VWHC-UQEG-FVV8-DHA7-KT5N",
+    "users": [
+      "폴",
+      "마일로"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw158",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_039@111percent.net",
+    "serialKey": "SC-F5GU-2HJY-PUXB-NUKH-BGCS",
+    "users": [
+      "세로",
+      "밤바"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw159",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_040@111percent.net",
+    "serialKey": "SC-D9PU-XFKU-JEYR-EJ4V-BVZ9",
+    "users": [
+      "루넥트",
+      "원"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw160",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_041@111percent.net",
+    "serialKey": "SC-25EG-KHB3-7JQH-EB9T-XZQE",
+    "users": [
+      "포엠",
+      "니모"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw161",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_042@111percent.net",
+    "serialKey": "SC-KX2E-PS63-EWCS-YAWA-QZDQ",
+    "users": [
+      "아이비",
+      "뇽"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw162",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_043@111percent.net",
+    "serialKey": "SC-8VB5-7DQ3-DBDS-END4-D9U4",
+    "users": [
+      "줄리",
+      "원더"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw163",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_044@111percent.net",
+    "serialKey": "SC-YYXP-VXWQ-4KSD-R5UA-QD4W",
+    "users": [
+      "미카",
+      "빌드 (제이케이)"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw164",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_045@111percent.net",
+    "serialKey": "SC-AMMF-BTVR-6K29-HRZ3-EU8H",
+    "users": [
+      "위즐",
+      "제리"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw165",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_046@111percent.net",
+    "serialKey": "SC-Y5D2-527X-NFXB-BTPD-HCBF",
+    "users": [
+      "도플",
+      "샐리"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw166",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_047@111percent.net",
+    "serialKey": "SC-TSPP-JEJ3-ABXS-FTDW-3DHN",
+    "users": [
+      "해머",
+      "로비(개발테스트)"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw167",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_048@111percent.net",
+    "serialKey": "SC-K6DK-KEZZ-XJHT-2533-3V4H",
+    "users": [
+      "피터",
+      "다오"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw168",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_049@111percent.net",
+    "serialKey": "SC-WPCG-PUN6-HMRR-39G5-B33D",
+    "users": [
+      "산타",
+      "클라라"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw169",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_050@111percent.net",
+    "serialKey": "SC-GGMG-Y9DU-ZKSR-D2KQ-U6PY",
+    "users": [
+      "부기",
+      "알토"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw170",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_051@111percent.net",
+    "serialKey": "SC-MMWM-AN7Q-EZFV-BREK-W9B2",
+    "users": [
+      "히포",
+      "제제"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw171",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_031@111percent.net",
+    "serialKey": "SC-8U7R-PWDR-AC4W-5AJQ-C3QZ",
+    "users": [
+      "무무"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": "활성화 문제 확인 필요"
+  },
+  {
+    "id": "sw172",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_052@111percent.net",
+    "serialKey": "SC-W4TJ-NM8C-CG8A-S2RH-DEY2",
+    "users": [
+      "테디",
+      "근쓰"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw173",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_053@111percent.net",
+    "serialKey": "SC-NP7E-3849-FH3W-397M-BDZS",
+    "users": [
+      "츠키",
+      "푸린"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw174",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_054@111percent.net",
+    "serialKey": "SC-7K4Z-J22H-QRY6-ZMBN-ZSX3",
+    "users": [
+      "도나",
+      "록시"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw175",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_055@111percent.net",
+    "serialKey": "SC-SCHQ-Z2XP-R7W2-XKEJ-CYJC",
+    "users": [
+      "윌슨",
+      "핑핑"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw176",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_056@111percent.net",
+    "serialKey": "SC-TC8J-2UWQ-ACT2-RGU3-SX48",
+    "users": [
+      "제이",
+      "달리"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw177",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_001@111percent.net",
+    "serialKey": "SC-CKHS-NZAX-MDFJ-SM5V-52SX",
+    "users": [
+      "피노",
+      "다즈"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw178",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_002@111percent.net",
+    "serialKey": "SC-BSFN-VJCA-Y89W-E4RC-EQ5A",
+    "users": [
+      "버즈",
+      "소호"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw179",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_003@111percent.net",
+    "serialKey": "SC-A5P6-QDJ4-THH4-FRNX-HP8X",
+    "users": [
+      "페퍼",
+      "에밀리"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw180",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_004@111percent.net",
+    "serialKey": "SC-MJ57-H4FU-C8BH-EWNW-Y85E",
+    "users": [
+      "차",
+      "챈스"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw181",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_005@111percent.net",
+    "serialKey": "SC-KB7C-3HTC-C6GD-7D7V-JFN9",
+    "users": [
+      "우르",
+      "늘보"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw182",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_006@111percent.net",
+    "serialKey": "SC-VJWA-AWC8-T6GE-5A5U-HKFN",
+    "users": [
+      "이로",
+      "쏘"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw183",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_007@111percent.net",
+    "serialKey": "SC-NM6X-GX9N-GEYQ-2ZKU-MRN9",
+    "users": [
+      "두비",
+      "쿤"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw184",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_008@111percent.net",
+    "serialKey": "SC-QCFZ-6HXS-NXFR-BUCM-GDH5",
+    "users": [
+      "슬로안",
+      "올리"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw185",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_009@111percent.net",
+    "serialKey": "SC-J3HY-NE99-A42A-HX55-7NKF",
+    "users": [
+      "센시",
+      "티버"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw186",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_010@111percent.net",
+    "serialKey": "SC-JPQY-FXRK-NJKA-GYGH-32DS",
+    "users": [
+      "호조",
+      "미니"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw187",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_011@111percent.net",
+    "serialKey": "SC-5CHX-2G9W-DXED-YS8D-VVNN",
+    "users": [
+      "테이",
+      "칼리"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw188",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_012@111percent.net",
+    "serialKey": "SC-43MX-NFR8-FZAA-C9GU-5CYN",
+    "users": [
+      "언블로",
+      "버드"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw189",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_013@111percent.net",
+    "serialKey": "SC-BRQQ-ZVGJ-GF9S-AUTT-MG4N",
+    "users": [
+      "까누",
+      "레비"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw190",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_014@111percent.net",
+    "serialKey": "SC-XDTK-5H9M-7V6T-AAYU-9YCK",
+    "users": [
+      "휴고",
+      "시안"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw191",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_015@111percent.net",
+    "serialKey": "SC-UKMQ-C625-6BTF-Q6SY-U35H",
+    "users": [
+      "도치",
+      "에이낙"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw192",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_017@111percent.net",
+    "serialKey": "SC-M8NH-YV4P-C9M8-2PYC-QJ79",
+    "users": [
+      "지카이스"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": "단독 사용"
+  },
+  {
+    "id": "sw193",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_018@111percent.net",
+    "serialKey": "SC-229B-QUYR-KY52-NR2U-RFKM",
+    "users": [
+      "월트",
+      "테이트"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw194",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_019@111percent.net",
+    "serialKey": "SC-KMFJ-FJ2R-QYNR-QW9E-K3D4",
+    "users": [
+      "슈리",
+      "조엘"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw195",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_020@111percent.net",
+    "serialKey": "SC-YKPM-G9FD-3ZUV-7U6N-BSR6",
+    "users": [
+      "포든",
+      "피비"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw196",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_021@111percent.net",
+    "serialKey": "SC-483J-A65S-4PS5-E2D3-HQWG",
+    "users": [
+      "제트",
+      "이지"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw197",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_022@111percent.net",
+    "serialKey": "SC-JKPT-S6AV-85HW-7BZQ-ZEAJ",
+    "users": [
+      "로저",
+      "아놀드"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw198",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_023@111percent.net",
+    "serialKey": "SC-PVU7-XFA3-CX94-QG6B-8GC2",
+    "users": [
+      "마스",
+      "제로"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw199",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_024@111percent.net",
+    "serialKey": "SC-32AW-XA8N-Q2XF-TEFZ-ENVM",
+    "users": [
+      "쌤",
+      "무디"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw200",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_025@111percent.net",
+    "serialKey": "SC-N9KB-KXN9-SGXU-F3MC-CJZF",
+    "users": [
+      "테리",
+      "몰리"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw201",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_026@111percent.net",
+    "serialKey": "SC-HHDR-9542-9PDB-VVDK-HJU3",
+    "users": [
+      "듀란",
+      "윌리엄"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw202",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_027@111percent.net",
+    "serialKey": "SC-6DEU-2GE4-U3M7-XXRG-BV4M",
+    "users": [
+      "안도"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw203",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_028@111percent.net",
+    "serialKey": "SC-SCGB-F3EV-TUVS-W2ZR-E2EU",
+    "users": [
+      "가몬드"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw204",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_029@111percent.net",
+    "serialKey": "SC-PXP4-8CBW-DRM4-ERQS-GJEM",
+    "users": [
+      "제노"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw205",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_111_030@111percent.net",
+    "serialKey": "SC-ND7C-RRFU-WMS6-XFAM-G4QG",
+    "users": [
+      "저스틴",
+      "포로"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw206",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_057@111percent.net",
+    "serialKey": "SC-XQBB-T83P-BAYN-5FVA-J99A",
+    "users": [
+      "큐온",
+      "까까"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw207",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_058@111percent.net",
+    "serialKey": "SC-J9NE-YQVU-8WT5-FBZF-85SP",
+    "users": [
+      "헨디",
+      "이솔"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw208",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_059@111percent.net",
+    "serialKey": "SC-K6C7-77R4-X8K4-RTJ6-H6UM",
+    "users": [
+      "도리",
+      "폴리"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw209",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_060@111percent.net",
+    "serialKey": "SC-8ES2-CJQ6-Q2AR-S5UT-HDRF",
+    "users": [
+      "브래드",
+      "홀든"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw210",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_061@111percent.net",
+    "serialKey": "SC-UU7M-3RSB-NYPC-ZZC4-3FCG",
+    "users": [
+      "안시",
+      "후크"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw211",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_062@111percent.net",
+    "serialKey": "SC-PY95-HMPW-W2NY-7PS7-YRYK",
+    "users": [
+      "도일",
+      "호제아"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw212",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_063@111percent.net",
+    "serialKey": "SC-CVJ7-Q38U-4B94-UZQY-VNMU",
+    "users": [
+      "카프카",
+      "베로"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw213",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_064@111percent.net",
+    "serialKey": "SC-QCNX-JQE8-T2X7-RU2T-EYUD",
+    "users": [
+      "리프",
+      "기술지원(루크)"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw214",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_065@111percent.net",
+    "serialKey": "SC-C6BD-4TG3-PBMW-FMW4-DTT4",
+    "users": [
+      "키코",
+      "그린"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw215",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_066@111percent.net",
+    "serialKey": "SC-ED5P-NJ3D-UERT-S3VY-8AU4",
+    "users": [
+      "제티",
+      "토리"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw216",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_067@111percent.net",
+    "serialKey": "SC-R7T4-H92T-PZM3-KNWM-EH7U",
+    "users": [
+      "조슈아(Steam Test)",
+      "웨이"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw217",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_068@111percent.net",
+    "serialKey": "SC-WSTS-FQND-2MMV-MUKU-DQ59",
+    "users": [
+      "태로",
+      "코지"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw218",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_069@111percent.net",
+    "serialKey": "SC-MKGN-KWKJ-N223-ZQWF-ABGP",
+    "users": [
+      "자유",
+      "루디"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw219",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_070@111percent.net",
+    "serialKey": "SC-MFES-8PFB-ENK9-X6JU-XJJ8",
+    "users": [
+      "빌드(제이케이)"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw220",
+    "tab": "Unity",
+    "cat": "111percent.net",
+    "name": "Unity Enterprise",
+    "account": "ga_unity_071@111percent.net",
+    "serialKey": "SC-MB9E-JMDF-MHTF-EBBV-VJN9",
+    "users": [
+      "빌드(제이케이)"
+    ],
+    "startDate": "",
+    "expireDate": "2027-06-25",
+    "form": "Annual",
+    "price": 0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw221",
+    "tab": "Autodesk",
+    "cat": "Autodesk",
+    "name": "Autodesk 3DS MAX",
+    "account": "benny@111percent.net",
+    "users": [
+      "베니"
+    ],
+    "startDate": "",
+    "expireDate": "2026-09-07",
+    "form": "Annual",
+    "price": 2070000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw222",
+    "tab": "Autodesk",
+    "cat": "Autodesk",
+    "name": "Autodesk 3DS MAX",
+    "account": "hun@111percent.net",
+    "users": [
+      "훈"
+    ],
+    "startDate": "",
+    "expireDate": "2026-09-07",
+    "form": "Annual",
+    "price": 2070000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw223",
+    "tab": "Autodesk",
+    "cat": "Autodesk",
+    "name": "Autodesk 3DS MAX",
+    "account": "pepper@111percent.net",
+    "users": [
+      "페퍼"
+    ],
+    "startDate": "",
+    "expireDate": "2026-09-07",
+    "form": "Annual",
+    "price": 2070000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw224",
+    "tab": "Autodesk",
+    "cat": "Autodesk",
+    "name": "Autodesk 3DS MAX",
+    "account": "timi@111percent.net",
+    "users": [
+      "티미"
+    ],
+    "startDate": "",
+    "expireDate": "2026-09-07",
+    "form": "Annual",
+    "price": 2070000.0,
+    "currency": "KRW",
+    "note": ""
+  },
+  {
+    "id": "sw225",
+    "tab": "Autodesk",
+    "cat": "Autodesk",
+    "name": "Autodesk 3DS MAX",
+    "account": "gugi@111percent.net",
+    "users": [
+      "구기"
+    ],
+    "startDate": "",
+    "expireDate": "2026-09-07",
+    "form": "Annual",
+    "price": 925000.0,
+    "currency": "KRW",
+    "note": ""
+  }
+];
+</script>
 <script>
 // HW/좌석: 구글시트 실시간 연동
 const SEED_ASSETS=[];const SEED_SEATS=[];
-const SEED_SW = [{"id": "sw001", "tab": "전사 공통 Saas", "category": "전사 공통", "name": "NOTION", "account": "", "user": "", "users": [], "expireDate": "2026-07-08", "form": "Annual", "priceRaw": 19457.37, "currency": "USD", "note": "", "alertType": "admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw002", "tab": "전사 공통 Saas", "category": "전사 공통", "name": "Slack", "account": "", "user": "", "users": [], "expireDate": "2026-08-08", "form": "Annual", "priceRaw": 11310.0, "currency": "USD", "note": "", "alertType": "admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw003", "tab": "전사 공통 Saas", "category": "전사 공통", "name": "Flex", "account": "", "user": "", "users": [], "expireDate": "", "form": "Monthly", "priceRaw": 1900000.0, "currency": "KRW", "note": "2024-09 업데이트 기준", "alertType": "admin", "monthlyEnd": true, "monthlyCalc": false}, {"id": "sw004", "tab": "전사 공통 Saas", "category": "전사 공통", "name": "GWS", "account": "", "user": "", "users": [], "expireDate": "", "form": "Monthly", "priceRaw": 3487.5, "currency": "USD", "note": "", "alertType": "admin", "monthlyEnd": true, "monthlyCalc": false}, {"id": "sw005", "tab": "MS", "category": "MS", "name": "MS Office 365", "account": "incrater111@111percent.onmicrosoft.com", "user": "", "users": [], "expireDate": "2026-11-16", "form": "Annual", "priceRaw": 100000.0, "currency": "KRW", "note": "소유주", "alertType": "admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw006", "tab": "MS", "category": "MS", "name": "MS 365 Business Standard", "account": "111percent11@111percent.onmicrosoft.com", "user": "", "users": [], "expireDate": "2026-11-16", "form": "Annual", "priceRaw": 100000.0, "currency": "KRW", "note": "", "alertType": "admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw007", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_001@111percent.net", "user": "세라, 칼리", "users": ["세라", "칼리"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw008", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_002@111percent.net", "user": "우디, 제임스", "users": ["우디", "제임스"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw009", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_004@111percent.net", "user": "아이비, 봄봄", "users": ["아이비", "봄봄"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw010", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_005@111percent.net", "user": "루이스, 안도", "users": ["루이스", "안도"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw011", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_006@111percent.net", "user": "클로버, 티미", "users": ["클로버", "티미"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw012", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_007@111percent.net", "user": "버드, 쏘", "users": ["버드", "쏘"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw013", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_008@111percent.net", "user": "나쵸, 디딧", "users": ["나쵸", "디딧"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw014", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_009@111percent.net", "user": "글렌, 켄", "users": ["글렌", "켄"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "쭈법인", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw015", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_010@111percent.net", "user": "뇽, 주디", "users": ["뇽", "주디"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw016", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_011@111percent.net", "user": "줄리, 밤바", "users": ["줄리", "밤바"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw017", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_012@111percent.net", "user": "피비, 채채", "users": ["피비", "채채"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw018", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_014@111percent.net", "user": "위즐, 레이", "users": ["위즐", "레이"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw019", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_015@111percent.net", "user": "미카, 훈", "users": ["미카", "훈"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw020", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_017@111percent.net", "user": "페퍼, 씨제이", "users": ["페퍼", "씨제이"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw021", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_018@111percent.net", "user": "멜리, 클라라", "users": ["멜리", "클라라"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw022", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_019@111percent.net", "user": "루마, 구기", "users": ["루마", "구기"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw023", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_030@111percent.net", "user": "산타, 카야", "users": ["산타", "카야"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw024", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_031@111percent.net", "user": "니모, 에밀리", "users": ["니모", "에밀리"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw025", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_022@111percent.net", "user": "누누, 누누", "users": ["누누", "누누"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "쭈 법인", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw026", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_025@111percent.net", "user": "히포, 제제", "users": ["히포", "제제"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw027", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_028@111percent.net", "user": "세나, 쿠엔틴", "users": ["세나", "쿠엔틴"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw028", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_029@111percent.net", "user": "슬로안, 쿤", "users": ["슬로안", "쿤"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw029", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_035@111percent.net", "user": "패트, 이브", "users": ["패트", "이브"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw030", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_036@111percent.net", "user": "제시, 레비", "users": ["제시", "레비"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw031", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_037@111percent.net", "user": "레지나, 언블로", "users": ["레지나", "언블로"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw032", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_038@111percent.net", "user": "홀든, 버즈", "users": ["홀든", "버즈"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw033", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_039@111percent.net", "user": "라킹, 듀란", "users": ["라킹", "듀란"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw034", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_032@111percent.net", "user": "미니, 까누", "users": ["미니", "까누"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw035", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_033@111percent.net", "user": "리프, 베니", "users": ["리프", "베니"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw036", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_044@111percent.net", "user": "샤아, 알토", "users": ["샤아", "알토"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw037", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_045@111percent.net", "user": "시안, 도치", "users": ["시안", "도치"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw038", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_046@111percent.net", "user": "오리, 오리", "users": ["오리", "오리"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "쭈 법인", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw039", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_047@111percent.net", "user": "피오, 핑핑", "users": ["피오", "핑핑"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw040", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_048@111percent.net", "user": "제이, 윌슨", "users": ["제이", "윌슨"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw041", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_050@111percent.net", "user": "테이, 센시", "users": ["테이", "센시"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw042", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_056@111percent.net", "user": "지나, 곤", "users": ["지나", "곤"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1205000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw043", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_057@111percent.net", "user": "토리, 그린", "users": ["토리", "그린"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1112000.0, "currency": "KRW", "note": "260622 ~", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw044", "tab": "Adobe", "category": "Adobe", "name": "Creative Cloud", "account": "ga_cc_059@111percent.net", "user": "코지", "users": ["코지"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1099400.0, "currency": "KRW", "note": "260625 ~", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw045", "tab": "Adobe", "category": "Adobe", "name": "Photoshop", "account": "ga_cc_013@111percent.net", "user": "벤, 무무", "users": ["벤", "무무"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 510000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw046", "tab": "Adobe", "category": "Adobe", "name": "Photoshop", "account": "ga_cc_020@111percent.net", "user": "원더, 헤일렌", "users": ["원더", "헤일렌"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 510000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw047", "tab": "Adobe", "category": "Adobe", "name": "Photoshop", "account": "ga_cc_021@111percent.net", "user": "두부, 소니아", "users": ["두부", "소니아"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 510000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw048", "tab": "Adobe", "category": "Adobe", "name": "Photoshop", "account": "ga_cc_023@111percent.net", "user": "맥스, 카프카", "users": ["맥스", "카프카"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 510000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw049", "tab": "Adobe", "category": "Adobe", "name": "Photoshop", "account": "ga_cc_024@111percent.net", "user": "로웬, 여니", "users": ["로웬", "여니"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 510000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw050", "tab": "Adobe", "category": "Adobe", "name": "Photoshop", "account": "ga_cc_026@111percent.net", "user": "늘보, 파즈", "users": ["늘보", "파즈"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 510000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw051", "tab": "Adobe", "category": "Adobe", "name": "Photoshop", "account": "ga_cc_027@111percent.net", "user": "올리, 제리", "users": ["올리", "제리"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 510000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw052", "tab": "Adobe", "category": "Adobe", "name": "Photoshop", "account": "ga_cc_051@111percent.net", "user": "큐온", "users": ["큐온"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 510000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw053", "tab": "Adobe", "category": "Adobe", "name": "Photoshop", "account": "ga_cc_052@111percent.net", "user": "까까", "users": ["까까"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 510000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw054", "tab": "Adobe", "category": "Adobe", "name": "Photoshop", "account": "ga_cc_053@111percent.net", "user": "헨디", "users": ["헨디"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 510000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw055", "tab": "Adobe", "category": "Adobe", "name": "Photoshop", "account": "ga_cc_054@111percent.net", "user": "도리, 기린", "users": ["도리", "기린"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 510000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw056", "tab": "Adobe", "category": "Adobe", "name": "Photoshop", "account": "ga_cc_058@111percent.net", "user": "자유", "users": ["자유"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 470000.0, "currency": "KRW", "note": "260622 ~", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw057", "tab": "Adobe", "category": "Adobe", "name": "Acrobat Pro", "account": "ga_cc_016@111percent.net", "user": "케일, 지아", "users": ["케일", "지아"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 430000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw058", "tab": "Adobe", "category": "Adobe", "name": "Acrobat Pro", "account": "ga_cc_040@111percent.net", "user": "베이, 리즈", "users": ["베이", "리즈"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 430000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw059", "tab": "Adobe", "category": "Adobe", "name": "Acrobat Pro", "account": "ga_cc_041@111percent.net", "user": "루비, 액스", "users": ["루비", "액스"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 430000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw060", "tab": "Adobe", "category": "Adobe", "name": "Acrobat Pro", "account": "ga_cc_034@111percent.net", "user": "법사, 커비", "users": ["법사", "커비"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 430000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw061", "tab": "Adobe", "category": "Adobe", "name": "Acrobat Pro", "account": "ga_cc_049@111percent.net", "user": "한영", "users": ["한영"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 430000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw062", "tab": "Adobe", "category": "Adobe", "name": "Substance 3D", "account": "ga_cc_033@111percent.net", "user": "캐피, 베니", "users": ["캐피", "베니"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1440000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw063", "tab": "Adobe", "category": "Adobe", "name": "Substance 3D", "account": "ga_cc_055@111percent.net", "user": "구기, 루이스", "users": ["구기", "루이스"], "expireDate": "2027-05-24", "form": "Annual", "priceRaw": 1440000.0, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw068", "tab": "Autodesk", "category": "Autodesk", "name": "3DS MAX", "account": "benny@111percent.net", "user": "베니", "users": ["베니"], "expireDate": "2026-09-07", "form": "Annual", "priceRaw": 2070000.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw069", "tab": "Autodesk", "category": "Autodesk", "name": "3DS MAX", "account": "hun@111percent.net", "user": "훈", "users": ["훈"], "expireDate": "2026-09-07", "form": "Annual", "priceRaw": 2070000.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw070", "tab": "Autodesk", "category": "Autodesk", "name": "3DS MAX", "account": "pepper@111percent.net", "user": "페퍼", "users": ["페퍼"], "expireDate": "2026-09-07", "form": "Annual", "priceRaw": 2070000.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw071", "tab": "Autodesk", "category": "Autodesk", "name": "3DS MAX", "account": "timi@111percent.net", "user": "티미", "users": ["티미"], "expireDate": "2026-09-07", "form": "Annual", "priceRaw": 2070000.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw072", "tab": "Autodesk", "category": "Autodesk", "name": "3DS MAX", "account": "gugi@111percent.net", "user": "구기", "users": ["구기"], "expireDate": "2026-09-07", "form": "Annual", "priceRaw": 925000.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw083", "tab": "구독서비스", "category": "postman", "name": "Basic", "account": "ga@111percent.net", "user": "리트", "users": ["리트"], "expireDate": "2027-02-23", "form": "Annual", "priceRaw": 117600.0, "currency": "KRW", "note": "Visa •••• 1417", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw084", "tab": "구독서비스", "category": "postman", "name": "Basic", "account": "ricky@111percent.net", "user": "리키", "users": ["리키"], "expireDate": "2027-02-23", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw085", "tab": "구독서비스", "category": "postman", "name": "Basic", "account": "nick@111percent.net", "user": "닉", "users": ["닉"], "expireDate": "2027-02-23", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw086", "tab": "구독서비스", "category": "postman", "name": "Basic", "account": "jalen@111percent.net", "user": "제일런", "users": ["제일런"], "expireDate": "2027-02-23", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw087", "tab": "구독서비스", "category": "postman", "name": "Basic", "account": "jacob@111percent.net", "user": "제이콥", "users": ["제이콥"], "expireDate": "2027-02-23", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw088", "tab": "구독서비스", "category": "postman", "name": "Flows", "account": "craig@111percent.net", "user": "크레이그", "users": ["크레이그"], "expireDate": "2027-02-23", "form": "Annual", "priceRaw": 144.0, "currency": "USD", "note": "", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw089", "tab": "구독서비스", "category": "Docker", "name": "Docker Pro", "account": "ga_unity_001@111percent.net", "user": "아바투르", "users": ["아바투르"], "expireDate": "2026-10-16", "form": "Annual", "priceRaw": 108.0, "currency": "USD", "note": "Visa •••• 1417", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw090", "tab": "구독서비스", "category": "Docker", "name": "Docker Pro", "account": "ga_unity_003@111percent.net", "user": "요다", "users": ["요다"], "expireDate": "2026-10-16", "form": "Annual", "priceRaw": 108.0, "currency": "USD", "note": "Visa •••• 1417", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw091", "tab": "구독서비스", "category": "Esoteric Software", "name": "Spine", "account": "9797040i2i224g9v9519v1i67hv9945i", "user": "클로버", "users": ["클로버"], "expireDate": "2026-05-08", "form": "Annual", "priceRaw": 379.0, "currency": "USD", "note": "Enterprise 연 $2499 발생", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw092", "tab": "구독서비스", "category": "Esoteric Software", "name": "Spine", "account": "", "user": "", "users": [], "expireDate": "2026-05-08", "form": "Annual", "priceRaw": 379.0, "currency": "USD", "note": "", "alertType": "admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw094", "tab": "구독서비스", "category": "Esoteric Software", "name": "Spine", "account": "", "user": "센시", "users": ["센시"], "expireDate": "2027-05-08", "form": "Annual", "priceRaw": 379.0, "currency": "USD", "note": "26년 1월 27일첫 결제/ 남은 기간 제외 $105 결제됨.", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw096", "tab": "구독서비스", "category": "Esoteric Software", "name": "Spine", "account": "", "user": "줄리", "users": ["줄리"], "expireDate": "2026-05-08", "form": "Annual", "priceRaw": 379.0, "currency": "USD", "note": "", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw098", "tab": "구독서비스", "category": "Midjourney Inc", "name": "Maxon One", "account": "111-BIRD", "user": "버드", "users": ["버드"], "expireDate": "2027-04-02", "form": "Annual", "priceRaw": 1800000.0, "currency": "KRW", "note": "버드 : 미사용, 쿤 : 사용중 으로 만료 기간 체크 후 쿤님 사용유무 확인 필요", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw099", "tab": "구독서비스", "category": "Midjourney Inc", "name": "Maxon One", "account": "111-KUN", "user": "쿤", "users": ["쿤"], "expireDate": "2027-04-02", "form": "", "priceRaw": 1800000.0, "currency": "KRW", "note": "", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw100", "tab": "구독서비스", "category": "envatoMarket", "name": "Elements Teams", "account": "sound@111percent.net", "user": "소유주", "users": ["소유주"], "expireDate": "2027-05-04", "form": "Annual", "priceRaw": 645.0, "currency": "USD", "note": "쿤님 사용중 / Splice & Envato\nID : sound@111percent.net\nUser Name : 111percent\nPW : Tkdnsem111!", "alertType": "admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw101", "tab": "구독서비스", "category": "envatoMarket", "name": "Elements Teams", "account": "sloan@111percent.net", "user": "슬로안", "users": ["슬로안"], "expireDate": "2027-05-04", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw102", "tab": "구독서비스", "category": "envatoMarket", "name": "Elements Teams", "account": "eve@111percent.net", "user": "이브", "users": ["이브"], "expireDate": "2027-05-04", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw103", "tab": "구독서비스", "category": "envatoMarket", "name": "Elements Teams", "account": "sarah@111percent.net", "user": "세라", "users": ["세라"], "expireDate": "2027-05-04", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw104", "tab": "구독서비스", "category": "envatoMarket", "name": "Elements Teams", "account": "levi@111percent.net", "user": "레비", "users": ["레비"], "expireDate": "2027-05-04", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw105", "tab": "구독서비스", "category": "envatoMarket", "name": "Elements Teams", "account": "ga@111percent.net", "user": "글렌", "users": ["글렌"], "expireDate": "2026-06-18", "form": "Annual", "priceRaw": 645.0, "currency": "USD", "note": "ZZOO팀 5명 사용", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw106", "tab": "구독서비스", "category": "envatoMarket", "name": "Elements Teams", "account": "", "user": "켄", "users": ["켄"], "expireDate": "", "form": "", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw107", "tab": "구독서비스", "category": "envatoMarket", "name": "Elements Teams", "account": "", "user": "누누", "users": ["누누"], "expireDate": "", "form": "", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw108", "tab": "구독서비스", "category": "envatoMarket", "name": "Elements Teams", "account": "", "user": "피비", "users": ["피비"], "expireDate": "", "form": "", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw109", "tab": "구독서비스", "category": "산돌폰트", "name": "산돌 라이프 20", "account": "incrater@111percent.net", "user": "1/2/3레이블", "users": ["1/2/3레이블"], "expireDate": "", "form": "Monthly", "priceRaw": 110000.0, "currency": "KRW", "note": "Visa •••• 1417", "alertType": "admin", "monthlyEnd": false, "monthlyCalc": true}, {"id": "sw111", "tab": "구독서비스", "category": "typecast", "name": "비즈니스 플랜", "account": "gfc31contents@gmail.com", "user": "슬로안,세라,쿤,레비", "users": ["슬로안,세라,쿤,레비"], "expireDate": "", "form": "", "priceRaw": null, "currency": "KRW", "note": "admgr 계정(관리자)에 초대된 멤버 계정으로 admgr 결제 금액에 플랜사용비용 포함되어있음", "alertType": "admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw112", "tab": "구독서비스", "category": "typecast", "name": "비즈니스 플랜", "account": "gfc32contents@gmail.com", "user": "버드,쏘,이브", "users": ["버드,쏘,이브"], "expireDate": "", "form": "", "priceRaw": null, "currency": "KRW", "note": "admgr 계정(관리자)에 초대된 멤버 계정으로 admgr 결제 금액에 플랜사용비용 포함되어있음", "alertType": "admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw113", "tab": "구독서비스", "category": "한글과 컴퓨터", "name": "한컴독스", "account": "-", "user": "리즈", "users": ["리즈"], "expireDate": "", "form": "Monthly", "priceRaw": 21800.0, "currency": "KRW", "note": "Visa •••• 1417", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": true}, {"id": "sw114", "tab": "구독서비스", "category": "한글과 컴퓨터", "name": "한컴독스", "account": "-", "user": "커비", "users": ["커비"], "expireDate": "", "form": "", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw115", "tab": "구독서비스", "category": "한글과 컴퓨터", "name": "한컴독스", "account": "111-LILY", "user": "릴리", "users": ["릴리"], "expireDate": "", "form": "", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw116", "tab": "구독서비스", "category": "한글과 컴퓨터", "name": "한컴독스", "account": "DESKTOP-F8OLF95", "user": "카야", "users": ["카야"], "expireDate": "", "form": "", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw117", "tab": "구독서비스", "category": "한글과 컴퓨터", "name": "한컴독스", "account": "DESKTOP-4UJLH0S", "user": "액스", "users": ["액스"], "expireDate": "", "form": "", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw118", "tab": "구독서비스", "category": "한글과 컴퓨터", "name": "한컴독스", "account": "", "user": "법사", "users": ["법사"], "expireDate": "", "form": "", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw119", "tab": "구독서비스", "category": "한글과 컴퓨터", "name": "한컴독스", "account": "novakm1@naver.com", "user": "에단", "users": ["에단"], "expireDate": "", "form": "Annual", "priceRaw": 49008.0, "currency": "KRW", "note": "", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw120", "tab": "구독서비스", "category": "Splice", "name": "Sound resource", "account": "incrater@111percent.net", "user": "호세", "users": ["호세"], "expireDate": "", "form": "Monthly", "priceRaw": 21.99, "currency": "USD", "note": "Visa •••• 1417", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": true}, {"id": "sw121", "tab": "구독서비스", "category": "Figma", "name": "Figma", "account": "ludo@111percent.net", "user": "루도", "users": ["루도"], "expireDate": "2026-07-25", "form": "Annual", "priceRaw": 211.2, "currency": "USD", "note": "", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw122", "tab": "구독서비스", "category": "Figma", "name": "Figma", "account": "craig@111percent.net", "user": "크레이그", "users": ["크레이그"], "expireDate": "", "form": "Monthly", "priceRaw": 22.0, "currency": "USD", "note": "", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": true}, {"id": "sw123", "tab": "구독서비스", "category": "Figma", "name": "Figma", "account": "jalen@111percent.net", "user": "제일런", "users": ["제일런"], "expireDate": "", "form": "Monthly", "priceRaw": 22.0, "currency": "USD", "note": "", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": true}, {"id": "sw124", "tab": "구독서비스", "category": "Figma", "name": "Figma", "account": "simon@111percent.net", "user": "사이먼", "users": ["사이먼"], "expireDate": "", "form": "Monthly", "priceRaw": 22.0, "currency": "USD", "note": "", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": true}, {"id": "sw125", "tab": "구독서비스", "category": "Figma", "name": "Figma", "account": "SUBS3-AI9H9-DA64L-8DA84", "user": "츠키", "users": ["츠키"], "expireDate": "2026-09-19", "form": "Annual", "priceRaw": 400.0, "currency": "USD", "note": "233(Amax 롯데)", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw126", "tab": "구독서비스", "category": "Figma", "name": "Figma", "account": "SUBSJ-VL0NU-8857W-C378C", "user": "푸린", "users": ["푸린"], "expireDate": "2026-09-19", "form": "Annual", "priceRaw": 400.0, "currency": "USD", "note": "233(Amax 롯데)", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw127", "tab": "구독서비스", "category": "벅스", "name": "월간 무제한 듣기", "account": "ga@111percent.net", "user": "인포데스크", "users": ["인포데스크"], "expireDate": "", "form": "Monthly", "priceRaw": 7900.0, "currency": "KRW", "note": "Visa •••• 1417", "alertType": "admin", "monthlyEnd": false, "monthlyCalc": true}, {"id": "sw128", "tab": "구독서비스", "category": "벅스", "name": "월간 무제한 듣기", "account": "ga_2@111percent.net", "user": "호세", "users": ["호세"], "expireDate": "", "form": "Monthly", "priceRaw": 5800.0, "currency": "KRW", "note": "Visa •••• 1417", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": true}, {"id": "sw129", "tab": "구독서비스", "category": "(주)플러스플라스틱", "name": "Keyshot Studio (1년)", "account": "SUKP-KXYF-WTMB-KXQ6-E5DU", "user": "", "users": [], "expireDate": "2025-01-01", "form": "Annual", "priceRaw": 1485000.0, "currency": "KRW", "note": "233(Amax 롯데)", "alertType": "admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw132", "tab": "구독서비스", "category": "LottieFiles", "name": "LottieFiles", "account": "ga@111percent.net", "user": "제일런(JQK)", "users": ["제일런(JQK)"], "expireDate": "", "form": "Annual", "priceRaw": 239.88, "currency": "USD", "note": "233(Amax 롯데)", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw136", "tab": "구독서비스", "category": "Kling AI", "name": "Kling AI Pro", "account": "public_sw2@111percent.net / Wntkdnl1!", "user": "세라, 쏘, 칼리", "users": ["세라, 쏘, 칼리"], "expireDate": "", "form": "Monthly", "priceRaw": 32.56, "currency": "USD", "note": "Visa •••• 1417", "alertType": "admin", "monthlyEnd": false, "monthlyCalc": true}, {"id": "sw138", "tab": "구독서비스", "category": "Freepik", "name": "Freepik - premium +", "account": "ga@111percent.net", "user": "피오", "users": ["피오"], "expireDate": "", "form": "Annual", "priceRaw": 24.33, "currency": "USD", "note": "Visa •••• 1417", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw139", "tab": "구독서비스", "category": "Freepik", "name": "Freepik - premium +", "account": "ga_2@111percent.net", "user": "쿤", "users": ["쿤"], "expireDate": "", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "Visa •••• 1417 / 스팀레이블(소니아) 쉐어", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw141", "tab": "구독서비스", "category": "Virlo", "name": "Virlo", "account": "ga_2@111percent.net", "user": "쌤", "users": ["쌤"], "expireDate": "", "form": "Monthly", "priceRaw": 149.0, "currency": "USD", "note": "Visa •••• 1417 / 1개월 테스트 후 연장유무 체크필요", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": true}, {"id": "sw142", "tab": "구독서비스", "category": "Lbox", "name": "Lbox", "account": "shinhyunjip@hotmail.com", "user": "법사", "users": ["법사"], "expireDate": "", "form": "Monthly", "priceRaw": 69900.0, "currency": "KRW", "note": "Visa •••• 1417 / 계정 및 변호사 인증 명의 동일 사유로 법사님 개인계정으로 결제했으며, 추후 법사님 퇴사시 해당 결제 해지 필수", "alertType": "admin_critical", "monthlyEnd": false, "monthlyCalc": true}, {"id": "sw143", "tab": "구독서비스", "category": "SuperLawyer", "name": "SuperLawyer", "account": "shinhyunjip@hotmail.com", "user": "법사", "users": ["법사"], "expireDate": "", "form": "Monthly", "priceRaw": 59400.0, "currency": "KRW", "note": "Visa •••• 1417 / 계정 및 변호사 인증 명의 동일 사유로 법사님 개인계정으로 결제했으며, 추후 법사님 퇴사시 해당 결제 해지 필수", "alertType": "admin_critical", "monthlyEnd": false, "monthlyCalc": true}, {"id": "sw144", "tab": "구독서비스", "category": "Tavily", "name": "Tavily", "account": "ga_2@111percent.net", "user": "제이콥", "users": ["제이콥"], "expireDate": "", "form": "Monthly", "priceRaw": null, "currency": "KRW", "note": "Visa •••• 1417 / 로그인시 깃허브로 로그인 필요", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": true}, {"id": "sw145", "tab": "구독서비스", "category": "Miricanvas", "name": "Miricanvas Pro", "account": "ga@111percent.net", "user": "카야", "users": ["카야"], "expireDate": "2027-04-28", "form": "Annual", "priceRaw": 160800.0, "currency": "KRW", "note": "Visa •••• 1417", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw146", "tab": "구독서비스", "category": "Mobbin", "name": "Mobbin Team Seat", "account": "ga@111percent.net", "user": "크레이그", "users": ["크레이그"], "expireDate": "2027-05-27", "form": "Annual", "priceRaw": 403200.0, "currency": "KRW", "note": "Visa •••• 1417", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw147", "tab": "구독서비스", "category": "Surfshark", "name": "Surfshark One", "account": "ga@111percent.net", "user": "곤", "users": ["곤"], "expireDate": "2028-06-15", "form": "Annual", "priceRaw": 121770.0, "currency": "KRW", "note": "233(Amax 롯데)", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw148", "tab": "구독서비스", "category": "CapCut", "name": "CapCut Pro", "account": "community@offmoon.net", "user": "소니아", "users": ["소니아"], "expireDate": "2028-06-18", "form": "Annual", "priceRaw": 178000.0, "currency": "KRW", "note": "Visa •••• 1417", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw149", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "wade@111percent.net", "user": "웨이드", "users": ["웨이드"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 361500.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw150", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "chad@111percent.net", "user": "채드", "users": ["채드"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 361500.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw151", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "abathur@111percent.net", "user": "아바투르", "users": ["아바투르"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 361500.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw152", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "wooloo@111percent.net", "user": "우르", "users": ["우르"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 361500.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw153", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "daz@111percent.net", "user": "다즈", "users": ["다즈"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 361500.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw154", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "paz@111percent.net", "user": "파즈", "users": ["파즈"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 361500.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw155", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "soho@111percent.net", "user": "소호", "users": ["소호"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 361500.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw156", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "burger@111percent.net", "user": "버거", "users": ["버거"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 361500.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw157", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "nick@111percent.net", "user": "닉", "users": ["닉"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 361500.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw158", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "one@111percent.net", "user": "원", "users": ["원"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 361500.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw159", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "carter@111percent.net", "user": "카터", "users": ["카터"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 361500.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw160", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "jikais@111percent.net", "user": "지카이스", "users": ["지카이스"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 361500.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw161", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "dopple@111percent.net", "user": "도플", "users": ["도플"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 361500.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw162", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "luke@111percent.net", "user": "루크", "users": ["루크"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 361500.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw163", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "leah@111percent.net", "user": "레아", "users": ["레아"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 361500.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw164", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "joshua@111percent.net", "user": "조슈아", "users": ["조슈아"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 361500.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw165", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "leet@111percent.net", "user": "리트", "users": ["리트"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 361500.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw166", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "toby@111percent.net", "user": "토비", "users": ["토비"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 361500.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw167", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "robbie@111percent.net", "user": "로비", "users": ["로비"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 361500.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw168", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "william@111percent.net", "user": "윌리엄", "users": ["윌리엄"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 361500.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw169", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "pino@111percent.net", "user": "피노", "users": ["피노"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 361500.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw170", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "leegong@111percent.net", "user": "이공", "users": ["이공"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 361500.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw171", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "walt@111percent.net", "user": "월트", "users": ["월트"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 361500.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw172", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "hojo@111percent.net", "user": "호조", "users": ["호조"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 515000.0, "currency": "KRW", "note": "26-09-05 ~", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw173", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "baro@111percent.net", "user": "바로", "users": ["바로"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 575000.0, "currency": "KRW", "note": "26-10-16 ~", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw174", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "kong@111percent.net", "user": "콩", "users": ["콩"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 561700.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw175", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "dalee@111percent.net", "user": "달리", "users": ["달리"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 530000.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw176", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "tate@111percent.net", "user": "테이트", "users": ["테이트"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 297000.0, "currency": "KRW", "note": "26-03-27 ~", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw177", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "tes@111percent.net", "user": "테스", "users": ["테스"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 214000.0, "currency": "KRW", "note": "26-05-07 ~", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw178", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "feather@111percent.net", "user": "페더", "users": ["페더"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 184800.0, "currency": "KRW", "note": "26-05-21 ~", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw179", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "doyle@111percent.net", "user": "도일", "users": ["도일"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 184800.0, "currency": "KRW", "note": "26-05-21 ~", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw180", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "anxi@111percent.net", "user": "안시", "users": ["안시"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 167000.0, "currency": "KRW", "note": "26-05-29~", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw181", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "vero@111percent.net", "user": "베로", "users": ["베로"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 117000.0, "currency": "KRW", "note": "26-06-18 ~", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw182", "tab": "JetBrains", "category": "JetBrains", "name": "Rider", "account": "ts_rider@111percent.net", "user": "기술지원(조슈아)", "users": ["기술지원(조슈아)"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 91700.0, "currency": "KRW", "note": "26-06-30 ~", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw183", "tab": "JetBrains", "category": "JetBrains", "name": "Datagrip", "account": "momo@111percent.net", "user": "모모", "users": ["모모"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 320000.0, "currency": "KRW", "note": "25-07-28 ~", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw184", "tab": "JetBrains", "category": "JetBrains", "name": "IntelliJ IDEA Ultimate", "account": "craig@111percent.net", "user": "크레이그", "users": ["크레이그"], "expireDate": "2026-08-03", "form": "Annual", "priceRaw": 676000.0, "currency": "KRW", "note": "", "alertType": "personal_admin", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw185", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "계정", "user": "사용자(1), 사용자(2)", "users": ["사용자(1)", "사용자(2)"], "expireDate": "만료일", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "비고", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw186", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "build_com@111percent.net", "user": "빌드, 빌드", "users": ["빌드", "빌드"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "게임베이스", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw187", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "build_unity1@111percent.net", "user": "빌드, 빌드", "users": ["빌드", "빌드"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "게임베이스", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw188", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "build_unity2@111percent.net", "user": "빌드, 빌드", "users": ["빌드", "빌드"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "게임베이스", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw189", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_001@111percent.net", "user": "한구, 지투", "users": ["한구", "지투"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw190", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_002@111percent.net", "user": "케이건, 루이스", "users": ["케이건", "루이스"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw191", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_003@111percent.net", "user": "레아, 세나", "users": ["레아", "세나"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw192", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_004@111percent.net", "user": "리틀, 지오", "users": ["리틀", "지오"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw193", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_005@111percent.net", "user": "버거, 호세", "users": ["버거", "호세"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw194", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_006@111percent.net", "user": "카터, SF빌드", "users": ["카터", "SF빌드"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw195", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_007@111percent.net", "user": "베니, 세라", "users": ["베니", "세라"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw196", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_008@111percent.net", "user": "방망, 챈들러", "users": ["방망", "챈들러"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw197", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_009@111percent.net", "user": "단델, 테스", "users": ["단델", "테스"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw198", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_010@111percent.net", "user": "닉, 닉", "users": ["닉", "닉"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw199", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_011@111percent.net", "user": "기술지원팀, 헤일렌", "users": ["기술지원팀", "헤일렌"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw200", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_012@111percent.net", "user": "빌드(제이케이), 레이", "users": ["빌드(제이케이)", "레이"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw201", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_014@111percent.net", "user": "토비, 라킹", "users": ["토비", "라킹"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw202", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_015@111percent.net", "user": "빌드(제이케이), 바로", "users": ["빌드(제이케이)", "바로"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw203", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_016@111percent.net", "user": "빌드(제이케이), 씨제이", "users": ["빌드(제이케이)", "씨제이"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw204", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_017@111percent.net", "user": "판다, 스윔", "users": ["판다", "스윔"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw205", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_018@111percent.net", "user": "페더, 우디", "users": ["페더", "우디"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw206", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_019@111percent.net", "user": "티미, 닥페", "users": ["티미", "닥페"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw207", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_020@111percent.net", "user": "채드, 봄봄", "users": ["채드", "봄봄"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw208", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_021@111percent.net", "user": "제시, 채채", "users": ["제시", "채채"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw209", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_022@111percent.net", "user": "루크, 주디", "users": ["루크", "주디"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw210", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_023@111percent.net", "user": "웨이드, 랜드", "users": ["웨이드", "랜드"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw211", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_024@111percent.net", "user": "빌드(제이케이), 두부", "users": ["빌드(제이케이)", "두부"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw212", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_025@111percent.net", "user": "파즈, 로비", "users": ["파즈", "로비"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw213", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_026@111percent.net", "user": "제임스, 이브", "users": ["제임스", "이브"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw214", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_027@111percent.net", "user": "릴라드, 클로버", "users": ["릴라드", "클로버"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw215", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_028@111percent.net", "user": "요다, 훈", "users": ["요다", "훈"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw216", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_029@111percent.net", "user": "구기, 제프", "users": ["구기", "제프"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw217", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_030@111percent.net", "user": "에린, 아르센", "users": ["에린", "아르센"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw218", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_032@111percent.net", "user": "기린, 콩", "users": ["기린", "콩"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw219", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_033@111percent.net", "user": "빌드 (제이케이), 세화", "users": ["빌드 (제이케이)", "세화"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw220", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_034@111percent.net", "user": "아바투르, 게임베이스공용", "users": ["아바투르", "게임베이스공용"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw221", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_035@111percent.net", "user": "리트, 조슈아", "users": ["리트", "조슈아"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw222", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_036@111percent.net", "user": "패트, 컨티뉴", "users": ["패트", "컨티뉴"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw223", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_037@111percent.net", "user": "마이크, 이공", "users": ["마이크", "이공"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw224", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_038@111percent.net", "user": "폴, 마일로", "users": ["폴", "마일로"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw225", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_039@111percent.net", "user": "세로, 밤바", "users": ["세로", "밤바"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw226", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_040@111percent.net", "user": "루넥트, 원", "users": ["루넥트", "원"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw227", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_041@111percent.net", "user": "포엠, 니모", "users": ["포엠", "니모"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw228", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_042@111percent.net", "user": "아이비, 뇽", "users": ["아이비", "뇽"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw229", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_043@111percent.net", "user": "줄리, 원더", "users": ["줄리", "원더"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw230", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_044@111percent.net", "user": "미카, 빌드 (제이케이)", "users": ["미카", "빌드 (제이케이)"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw231", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_045@111percent.net", "user": "위즐, 제리", "users": ["위즐", "제리"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw232", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_046@111percent.net", "user": "도플, 샐리", "users": ["도플", "샐리"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw233", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_047@111percent.net", "user": "해머, 로비(개발테스트)", "users": ["해머", "로비(개발테스트)"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw234", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_048@111percent.net", "user": "피터, 다오", "users": ["피터", "다오"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw235", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_049@111percent.net", "user": "산타, 클라라", "users": ["산타", "클라라"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw236", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_050@111percent.net", "user": "부기, 알토", "users": ["부기", "알토"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw237", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_051@111percent.net", "user": "히포, 제제", "users": ["히포", "제제"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw238", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_031@111percent.net", "user": "무무", "users": ["무무"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "활성화 문제 확인 필요", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw239", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_052@111percent.net", "user": "테디, 근쓰", "users": ["테디", "근쓰"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw240", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_053@111percent.net", "user": "츠키, 푸린", "users": ["츠키", "푸린"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw241", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_054@111percent.net", "user": "도나, 록시", "users": ["도나", "록시"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw242", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_055@111percent.net", "user": "윌슨, 핑핑", "users": ["윌슨", "핑핑"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw243", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_056@111percent.net", "user": "제이, 달리", "users": ["제이", "달리"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw244", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_001@111percent.net", "user": "피노, 다즈", "users": ["피노", "다즈"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw245", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_002@111percent.net", "user": "버즈, 소호", "users": ["버즈", "소호"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw246", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_003@111percent.net", "user": "페퍼, 에밀리", "users": ["페퍼", "에밀리"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw247", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_004@111percent.net", "user": "차, 챈스", "users": ["차", "챈스"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw248", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_005@111percent.net", "user": "우르, 늘보", "users": ["우르", "늘보"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw249", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_006@111percent.net", "user": "이로, 쏘", "users": ["이로", "쏘"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw250", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_007@111percent.net", "user": "두비, 쿤", "users": ["두비", "쿤"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw251", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_008@111percent.net", "user": "슬로안, 올리", "users": ["슬로안", "올리"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw252", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_009@111percent.net", "user": "센시, 티버", "users": ["센시", "티버"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw253", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_010@111percent.net", "user": "호조, 미니", "users": ["호조", "미니"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw254", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_011@111percent.net", "user": "테이, 칼리", "users": ["테이", "칼리"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw255", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_012@111percent.net", "user": "언블로, 버드", "users": ["언블로", "버드"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw256", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_013@111percent.net", "user": "까누, 레비", "users": ["까누", "레비"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw257", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_014@111percent.net", "user": "휴고, 시안", "users": ["휴고", "시안"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw258", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_015@111percent.net", "user": "도치, 에이낙", "users": ["도치", "에이낙"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw259", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_017@111percent.net", "user": "지카이스, 지카이스", "users": ["지카이스", "지카이스"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "단독 사용", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw260", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_018@111percent.net", "user": "월트, 테이트", "users": ["월트", "테이트"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw261", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_019@111percent.net", "user": "조엘", "users": ["조엘"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw262", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_020@111percent.net", "user": "포든, 피비", "users": ["포든", "피비"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw263", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_021@111percent.net", "user": "제트, 이지", "users": ["제트", "이지"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw264", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_022@111percent.net", "user": "로저, 아놀드", "users": ["로저", "아놀드"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw265", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_023@111percent.net", "user": "마스, 제로", "users": ["마스", "제로"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw266", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_024@111percent.net", "user": "쌤, 무디", "users": ["쌤", "무디"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw267", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_025@111percent.net", "user": "테리, 몰리", "users": ["테리", "몰리"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw268", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_026@111percent.net", "user": "듀란, 윌리엄", "users": ["듀란", "윌리엄"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw269", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_027@111percent.net", "user": "안도", "users": ["안도"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw270", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_028@111percent.net", "user": "가몬드", "users": ["가몬드"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw271", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_029@111percent.net", "user": "제노", "users": ["제노"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw272", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_111_030@111percent.net", "user": "저스틴, 포로", "users": ["저스틴", "포로"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw273", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_057@111percent.net", "user": "큐온, 까까", "users": ["큐온", "까까"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw274", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_058@111percent.net", "user": "헨디, 이솔", "users": ["헨디", "이솔"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw275", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_059@111percent.net", "user": "도리, 폴리", "users": ["도리", "폴리"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw276", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_060@111percent.net", "user": "홀든", "users": ["홀든"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw277", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_061@111percent.net", "user": "안시, 후크", "users": ["안시", "후크"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw278", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_062@111percent.net", "user": "도일, 호제아", "users": ["도일", "호제아"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw279", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_063@111percent.net", "user": "카프카, 베로", "users": ["카프카", "베로"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw280", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_064@111percent.net", "user": "리프, 기술지원(루크)", "users": ["리프", "기술지원(루크)"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw281", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_065@111percent.net", "user": "키코, 그린", "users": ["키코", "그린"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw282", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_066@111percent.net", "user": "제티, 토리", "users": ["제티", "토리"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw283", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_067@111percent.net", "user": "조슈아(Steam Test), 웨이", "users": ["조슈아(Steam Test)", "웨이"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw284", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_068@111percent.net", "user": "태로, 코지", "users": ["태로", "코지"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw285", "tab": "Unity", "category": "Unity", "name": "Unity Ent.", "account": "ga_unity_069@111percent.net", "user": "자유, 루디", "users": ["자유", "루디"], "expireDate": "2027-06-25", "form": "Annual", "priceRaw": null, "currency": "KRW", "note": "", "alertType": "dual", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw286", "tab": "AI Tool", "category": "Claude", "name": "Claude Pro", "account": "ga@111percent.net", "user": "쿤", "users": ["쿤"], "expireDate": "", "form": "Monthly", "priceRaw": 22.0, "currency": "USD", "note": "Visa •••• 1417 / 이메일 링크 접속 방식", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": true}, {"id": "sw287", "tab": "AI Tool", "category": "Claude", "name": "Claude Max", "account": "ga_2@111percent.net", "user": "닉", "users": ["닉"], "expireDate": "", "form": "Monthly", "priceRaw": 220.0, "currency": "USD", "note": "Visa •••• 1417", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": true}, {"id": "sw288", "tab": "AI Tool", "category": "Open AI", "name": "Open AI", "account": "openai@111percent.net", "user": "피터", "users": ["피터"], "expireDate": "", "form": "Monthly", "priceRaw": null, "currency": "KRW", "note": "Visa •••• 1417 / platform.openai.com", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": true}, {"id": "sw289", "tab": "AI Tool", "category": "Cursor", "name": "Cursor AI Pro (1년)", "account": "ga@111percent.net", "user": "한구", "users": ["한구"], "expireDate": "2027-01-03", "form": "Annual", "priceRaw": 192.0, "currency": "USD", "note": "233(Amax 롯데) / https://www.cursor.com", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw290", "tab": "AI Tool", "category": "Midjourney Inc", "name": "Midjourney", "account": "incrater@111percent.net", "user": "우디", "users": ["우디"], "expireDate": "2026-07-17", "form": "Annual", "priceRaw": 316.8, "currency": "USD", "note": "Visa •••• 1417 / https://www.midjourney.com/checkout/plans?hash=2f8585b594e9776204e5cdee389a1c7594e313dbaea49a8a8125252ba43388ceb8d62907a8d63725c10254aee4f64f88Dcq/BdQSAErx3Sn53SJvSFMhHs/v5SGm93wnnRFUj4D9AdEVFzqThY9XexsBm4cB1JZ3N2Fv8J6Bpt9zff1Tz2WqqwUX1u/vj5%200CfD4MauMtUecYs6n0RNxTh91%20v88y8H0jR77ALtAHUzYlXJPpZscvOJhkJIo/1UPZaCCv/brsoBipJraK5PEsxTjTCkxsCBpeBUaLZD/Pwiy5oHuIuWRsyT8XqF8HjpY7eLPi5pAKUJ2G08B4kcmuBQPTUF/xCb%20JtCXmTSVaHeeCNCsyvLhOHeKaBEaGeESMnMRKT0=", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw291", "tab": "AI Tool", "category": "Kling AI", "name": "Kling AI Pro", "account": "public_sw@111percent.net", "user": "버드", "users": ["버드"], "expireDate": "2026-08-04", "form": "Annual", "priceRaw": 293.04, "currency": "USD", "note": "Visa •••• 1417 / https://app.klingai.com/global/membership/membership-plan", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": false}, {"id": "sw292", "tab": "AI Tool", "category": "Kling AI", "name": "Kling AI", "account": "public_sw2@111percent.net / Wntkdnl1!", "user": "세라, 쏘, 칼리", "users": ["세라, 쏘, 칼리"], "expireDate": "", "form": "Monthly", "priceRaw": 32.56, "currency": "USD", "note": "Visa •••• 1417", "alertType": "admin", "monthlyEnd": false, "monthlyCalc": true}, {"id": "sw293", "tab": "AI Tool", "category": "higgsfield AI", "name": "higgsfield AI", "account": "public_sw1@111percent.net / Wntkdnl1!", "user": "쿤, 슬로안", "users": ["쿤, 슬로안"], "expireDate": "", "form": "Monthly", "priceRaw": 150.0, "currency": "USD", "note": "Visa •••• 1417 / https://higgsfield.ai/me/settings/team/billing", "alertType": "admin", "monthlyEnd": false, "monthlyCalc": true}, {"id": "sw294", "tab": "AI Tool", "category": "11ElevenLabs", "name": "11ElevenLabs - Creater", "account": "ga_2@111percent.net", "user": "버드", "users": ["버드"], "expireDate": "", "form": "Monthly", "priceRaw": 24.2, "currency": "USD", "note": "Visa •••• 1417", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": true}, {"id": "sw295", "tab": "AI Tool", "category": "typecast", "name": "비즈니스 플랜", "account": "admgr@111percent.net", "user": "마케팅공용계정(쌤)", "users": ["마케팅공용계정(쌤)"], "expireDate": "", "form": "Monthly", "priceRaw": 119000.0, "currency": "KRW", "note": "Visa •••• 1417 / https://app.typecast.ai/ko/login", "alertType": "admin", "monthlyEnd": false, "monthlyCalc": true}, {"id": "sw298", "tab": "AI Tool", "category": "SUNO", "name": "SUNO AI Pro", "account": "suno_111percent@111percent.net", "user": "호세(사운드)", "users": ["호세(사운드)"], "expireDate": "", "form": "Monthly", "priceRaw": 30.0, "currency": "USD", "note": "Visa •••• 1417 / Google 계정으로 로그인", "alertType": "personal", "monthlyEnd": false, "monthlyCalc": true}];
-</script>
-<script>
+
+
 // ============ State ============
 const LS_KEY = 'asset_dashboard_v1';
 const LS_SHEET_KEY = 'asset_dashboard_sheet_config';
@@ -1027,22 +4907,18 @@ function renderCharts(active) {
     }
   });
 
-  // 사용기간 분포 (사용중, 도넛)
+  // 자산명별 분포 (도넛)
   destroyChart('age');
-  const ageBuckets = { '1년 미만': 0, '1~3년': 0, '3~5년': 0, '5년 초과': 0, '불명': 0 };
-  used.forEach(a => {
-    const y = yearsSince(a.acqDate);
-    if (y === null) ageBuckets['불명']++;
-    else if (y < 1) ageBuckets['1년 미만']++;
-    else if (y < 3) ageBuckets['1~3년']++;
-    else if (y < 5) ageBuckets['3~5년']++;
-    else ageBuckets['5년 초과']++;
-  });
+  const nameCount = countBy(active, a => a.name || '기타');
+  const nameSorted = Object.entries(nameCount).sort((a, b) => b[1] - a[1]);
+  const nameLabels = nameSorted.map(e => e[0]);
+  const nameValues = nameSorted.map(e => e[1]);
+  const namePalette = ['#2f5d50','#2f5276','#9a5b14','#a13d2f','#5b3ea8','#2f6d4a','#6b665c','#1e3a34','#9d978b','#4a3d6b'];
   charts.age = new Chart(document.getElementById('chart-age'), {
     type: 'doughnut',
     data: {
-      labels: Object.keys(ageBuckets),
-      datasets: [{ data: Object.values(ageBuckets), backgroundColor: ['#2f6d4a','#2f5276','#9a5b14','#a13d2f','#9d978b'], borderWidth: 0 }]
+      labels: nameLabels,
+      datasets: [{ data: nameValues, backgroundColor: nameLabels.map((_, i) => namePalette[i % namePalette.length]), borderWidth: 0 }]
     },
     options: { plugins: { legend: { position: 'right', labels: { font: { size: 11 }, boxWidth: 10, padding: 8 } } }, maintainAspectRatio: false }
   });
@@ -1437,7 +5313,7 @@ let swPage = 1;
 const SW_PAGE_SIZE = 30;
 
 function loadSw() {
-  // SW는 내장 데이터 사용 (시트 구조가 복잡해 실시간 연동 대신 파일 업데이트 방식)
+  // 최초 로드 시 임시 표시용 (구글시트 실시간 pull 전까지). pullFromSheet()에서 실제 데이터로 교체됨
   swList = typeof SEED_SW !== 'undefined' ? JSON.parse(JSON.stringify(SEED_SW)) : [];
 }
 
@@ -1649,7 +5525,7 @@ function getFilteredSw() {
   const alertF = document.getElementById('sw-filter-alert').value;
   const tabF = document.getElementById('sw-filter-tab').value;
   return swList.filter(s => {
-    if (q && !([s.name, s.user, s.category].join(' ').toLowerCase().includes(q))) return false;
+    if (q && !([s.name, s.user, s.category, ...(s.users||[])].join(' ').toLowerCase().includes(q))) return false;
     if (formF && s.form !== formF) return false;
     if (alertF && s.alertType !== alertF) return false;
     if (tabF && s.tab !== tabF) return false;
@@ -1690,6 +5566,9 @@ function renderSwList() {
       : s.monthlyCalc
         ? `월간 자동결제 <span style="font-size:10.5px;color:var(--text-muted);">(다음 결제 ${effDate})</span>`
         : (escapeHtml(s.expireDate) || '<span class="empty-loc">자동결제</span>');
+    const usersDisplay = (s.users && s.users.length > 0)
+      ? s.users.map(u => `<span style="display:inline-block;background:var(--tag-bg,#e8f0e8);color:var(--tag-text,#2f5d50);border-radius:4px;padding:1px 6px;font-size:11px;margin:1px;">${escapeHtml(u)}</span>`).join(' ')
+      : (escapeHtml(s.user) || '<span class="empty-loc">미지정</span>');
     return `<tr style="${rowStyle}">
       <td>
         ${s.tab === 'Unity'
@@ -1697,7 +5576,8 @@ function renderSwList() {
           : `<div style="font-size:11px;color:var(--text-muted);">${escapeHtml(s.category)}</div><div style="font-weight:600;">${escapeHtml(s.name)}</div>`
         }
       </td>
-      <td>${escapeHtml(s.user) || '<span class="empty-loc">미지정</span>'}</td>
+      <td style="font-size:11.5px;color:var(--text-muted);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(s.account)}">${escapeHtml(s.account) || '<span class="empty-loc">—</span>'}</td>
+      <td>${usersDisplay}</td>
       <td><span class="badge b-cat">${escapeHtml(s.form) || '—'}</span></td>
       <td style="white-space:nowrap;">${expireDisplay}</td>
       <td>${ddayBadge(effDate)}</td>
@@ -2058,6 +5938,183 @@ function parseHwSheetData(sheetData) {
   return result;
 }
 
+function parseSwSheetData(sheetData) {
+  const TAB_CONFIGS = {
+    '전사 공통 Saas': { headerRow: 10, cols: { cat: 0, name: 1, variant: 2, expire: 3, form: 4, price: 5, note: 6 }, fillDown: ['cat'] },
+    'MS':            { headerRow: 8,  cols: { cat: 0, name: 1, account: 2, pw: 3, users: [4,5,6,7,8,9,10], expire: 11 }, fillDown: ['cat','name'], skipIfNoUsers: true },
+    'Adobe':         { headerRow: 8,  cols: { cat: 0, name: 1, account: 2, pw: 3, users: [4,5], expire: 6, price: 7, note: 8 }, fillDown: ['cat'] },
+    'Unity':         { headerRow: 9,  cols: { cat: 0, name: 1, account: 2, pw: 3, serial: 4, users: [5,6], expire: 9, price: 10, note: 11 }, fillDown: ['cat','name'] },
+    'JetBrains':     { headerRow: 3,  cols: { cat: 0, name: 1, serial: 2, account: 3, users: [4], expire: 5, price: 6, note: 7 }, fillDown: ['cat','name'] },
+    'Autodesk':      { headerRow: 9,  cols: { cat: 0, name: 1, account: 2, pw: 3, users: [4], expire: 5, price: 6, note: 7 }, fillDown: ['cat'] },
+    '구독서비스':      { headerRow: 8,  cols: { cat: 0, name: 1, account: 2, users: [3], start: 4, expire: 5, form: 6, price: 7, note: 8, admin: 9, pw: 10, link: 11 }, fillDown: ['cat','name'] },
+    'AI Tool':       { headerRow: 1,  cols: { cat: 1, vendor: 2, name: 3, account: 4, users: [5], start: 6, expire: 7, form: 8, price: 9, note: 10, admin: 11 }, fillDown: ['cat','vendor','name'], commaUsers: true, mergeVendorName: true },
+    '영구라이선스':    { headerRow: 8,  cols: { cat: 0, name: 1, serial: 2, users: [3], expire: 4, price: 5, note: 6, account: 7, pw: 8, link: 9 }, fillDown: ['cat','name','account','pw','link','serial'], perpetual: true },
+  };
+
+  function cv(v) {
+    if (v === null || v === undefined) return '';
+    return String(v).trim();
+  }
+
+  function isEmpty(v) {
+    return v === null || v === undefined || cv(v) === '';
+  }
+
+  function cd(v) {
+    // 날짜 -> yyyy-mm-dd 문자열. Lifetime/'-' 등은 빈 문자열(만료일 없음)로 정규화
+    if (isEmpty(v)) return '';
+    if (v instanceof Date) return v.toISOString().slice(0, 10);
+    const s = String(v).trim();
+    if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
+    if (/^lifetime$/i.test(s) || s === '-') return '';
+    if (typeof v === 'number') {
+      // 구글시트 시리얼 넘버 -> 날짜 (거의 안 쓰이지만 대비)
+      const d = new Date(Math.round((v - 25569) * 86400 * 1000));
+      return d.toISOString().slice(0, 10);
+    }
+    return s; // 알 수 없는 형태는 원문 유지 (검색/표시용)
+  }
+
+  function parsePrice(raw, fmt) {
+    if (isEmpty(raw)) return { price: 0, currency: 'KRW' };
+    if (typeof raw === 'number') {
+      let currency = 'KRW';
+      if (fmt && /\$|USD/i.test(fmt)) currency = 'USD';
+      else if (fmt && /€|EUR/i.test(fmt)) currency = 'EUR';
+      else if (fmt && /£|GBP/i.test(fmt)) currency = 'GBP';
+      return { price: raw, currency };
+    }
+    const s = String(raw).trim();
+    if (s.includes('$')) return { price: parseFloat(s.replace(/[^0-9.]/g, '')) || 0, currency: 'USD' };
+    if (s.includes('€')) return { price: parseFloat(s.replace(/\./g, '').replace(',', '.').replace(/[^0-9.]/g, '')) || 0, currency: 'EUR' };
+    if (s.includes('£')) return { price: parseFloat(s.replace(/[^0-9.]/g, '')) || 0, currency: 'GBP' };
+    const n = parseFloat(s.replace(/,/g, ''));
+    if (!isNaN(n)) {
+      let currency = 'KRW';
+      if (fmt && /\$|USD/i.test(fmt)) currency = 'USD';
+      else if (fmt && /€|EUR/i.test(fmt)) currency = 'EUR';
+      return { price: n, currency };
+    }
+    return { price: 0, currency: 'KRW' }; // 숫자로 못 읽으면 0 처리
+  }
+
+  function getRows(tabName) {
+    const d = sheetData[tabName];
+    if (!d) return null;
+    if (Array.isArray(d)) return d;            // 구 포맷: 탭이름 -> [[행...]]
+    if (d.values) return d.values;              // 신 포맷: 탭이름 -> {values, formats}
+    return null;
+  }
+  function getFormats(tabName) {
+    const d = sheetData[tabName];
+    if (d && !Array.isArray(d) && d.formats) return d.formats;
+    return null;
+  }
+
+  const allTabs = Object.keys(sheetData);
+  const result = [];
+  let sid = 1;
+
+  Object.entries(TAB_CONFIGS).forEach(([tabName, cfg]) => {
+    // 탭 이름 정확히 일치하는 것만 사용 (Adobe(2024~2025) 같은 아카이브 탭 오매칭 방지)
+    const realTab = allTabs.find(t => t.trim() === tabName);
+    if (!realTab) return;
+    const rows = getRows(realTab);
+    if (!rows) return;
+    const formats = getFormats(realTab);
+
+    const last = {}; // fill-down 캐시
+
+    for (let i = cfg.headerRow + 1; i < rows.length; i++) {
+      const r = rows[i];
+      if (!r || !r.some(c => !isEmpty(c))) continue;
+
+      // fill-down 처리
+      (cfg.fillDown || []).forEach(key => {
+        const idx = cfg.cols[key];
+        if (idx === undefined) return;
+        const raw = r[idx];
+        if (!isEmpty(raw)) last[key] = raw;
+      });
+      function val(key) {
+        const idx = cfg.cols[key];
+        if (idx === undefined) return '';
+        const raw = r[idx];
+        if (!isEmpty(raw)) return raw;
+        return (cfg.fillDown || []).includes(key) ? (last[key] || '') : '';
+      }
+
+      // 사용자 컬럼(단일 index 또는 배열)
+      let users = [];
+      const uc = cfg.cols.users;
+      if (Array.isArray(uc)) {
+        users = uc.map(idx => cv(r[idx])).filter(u => u && u !== '-');
+      } else if (uc !== undefined) {
+        const raw = cv(r[uc]);
+        if (cfg.commaUsers && raw) users = raw.split(/[,\/]/).map(s => s.trim()).filter(Boolean);
+        else if (raw && raw !== '-') users = [raw];
+      }
+
+      if (cfg.skipIfNoUsers && users.length === 0) continue;
+
+      const cat = cv(val('cat'));
+      const vendor = cfg.cols.vendor !== undefined ? cv(val('vendor')) : '';
+      let name = cv(val('name'));
+      if (cfg.mergeVendorName) name = [vendor, name].filter(Boolean).join(' ');
+      if (cfg.cols.variant !== undefined) {
+        const variant = cv(r[cfg.cols.variant]);
+        if (variant) name = [name, variant].filter(Boolean).join(' ');
+      }
+      if (!name && !cat) continue;
+
+      const account = cfg.cols.account !== undefined ? cv(val('account')) : '';
+      const serial = cfg.cols.serial !== undefined ? cv(val('serial')) : '';
+      const startDate = cfg.cols.start !== undefined ? cd(r[cfg.cols.start]) : '';
+      const expireDate = cfg.cols.expire !== undefined ? cd(r[cfg.cols.expire]) : '';
+      const priceIdx = cfg.cols.price;
+      const priceRawCell = priceIdx !== undefined ? r[priceIdx] : null;
+      const priceFmt = formats ? (formats[i] ? formats[i][priceIdx] : null) : null;
+      const { price, currency } = parsePrice(priceRawCell, priceFmt);
+      let form = cfg.cols.form !== undefined ? cv(r[cfg.cols.form]) : '';
+      if (!form) form = cfg.perpetual ? 'Perpetual' : 'Annual';
+      let note = cfg.cols.note !== undefined ? cv(r[cfg.cols.note]) : '';
+      if (cfg.perpetual) {
+        const rawExpire = cv(r[cfg.cols.expire]);
+        if (/lifetime/i.test(rawExpire)) note = [note, '영구 라이선스(Lifetime)'].filter(Boolean).join(' · ');
+      }
+      if (serial) note = [note, serial.length > 40 ? '' : `SN:${serial}`].filter(Boolean).join(' · ');
+
+      // 알림 유형 추정 (수동 지정 필드가 없어서 사용자 수/계정 형태로 추정)
+      let alertType = 'admin';
+      if (users.length === 1) alertType = 'personal';
+      else if (users.length >= 2) alertType = 'dual';
+
+      result.push({
+        id: `sw_${tabName}_${i}`.replace(/\s+/g, ''), // 탭+행번호 기반 고정 ID (재동기화해도 안 바뀜)
+        tab: tabName,
+        cat: cat || tabName,
+        category: cat || tabName, // renderSwList 등에서 쓰는 필드명
+        name: name || '(제품명 미상)',
+        account,
+        users,
+        user: users[0] || '', // 단일 사용자 필드 (검색/구식 코드 호환용)
+        startDate,
+        expireDate,
+        form,
+        price,
+        priceRaw: price, // renderSwList/formatPrice 등에서 쓰는 필드명
+        currency,
+        note,
+        alertType,
+        monthlyEnd: false,
+        monthlyCalc: form === 'Monthly',
+      });
+    }
+  });
+
+  return result;
+}
+
 function fetchSheet(url) {
   return new Promise((resolve, reject) => {
     const cbName = '_cb' + Date.now() + Math.floor(Math.random()*10000);
@@ -2129,8 +6186,27 @@ async function pullFromSheet(silent = false) {
     }
   }
 
-  // SW — 내장 데이터 사용 (시트 구조 복잡으로 별도 관리)
-  // SW URL이 있어도 실제 fetch 생략
+  // SW Pull - 독립 처리 (기존 정적 스냅샷 대신 실시간 파싱)
+  if (cfg.sw) {
+    try {
+      const data = await fetchSheet(cfg.sw);
+      let swAssets = [];
+
+      if (typeof data === 'object' && !Array.isArray(data)) {
+        swAssets = parseSwSheetData(data);
+      }
+
+      if (swAssets.length) {
+        swList = swAssets;
+        loadSwUserData(); // localStorage에 사용자가 수동 추가한 항목 병합
+        done.push(`SW ${swList.length}건`);
+      } else {
+        if (!silent) logSync('SW 파싱 결과 없음 — Apps Script 코드/시트 구조를 확인해주세요', true);
+      }
+    } catch(e) {
+      if (!silent) logSync('SW 가져오기 실패 — ' + e.message, true);
+    }
+  }
 
   // 좌석 Pull - 독립 처리
   if (cfg.seats) {
@@ -2179,6 +6255,9 @@ async function pullFromSheet(silent = false) {
   if (activeView === 'replace') renderReplaceCandidates();
   if (activeView === 'stock') renderStock();
   if (activeView === 'people') renderPeople();
+  if (activeView === 'sw-dashboard') renderSwDashboard();
+  if (activeView === 'sw-list') renderSwList();
+  if (activeView === 'sw-alert') renderSwAlert();
 
   const now = new Date();
   const timeStr = now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'});
@@ -2211,12 +6290,34 @@ const APPS_SCRIPT_CODE = `function doGet(e) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var result = {};
   ss.getSheets().forEach(function(sheet) {
-    var data = sheet.getDataRange().getValues();
-    result[sheet.getName()] = data;
+    var range = sheet.getDataRange();
+    result[sheet.getName()] = {
+      values: range.getValues(),
+      formats: range.getNumberFormats()
+    };
   });
+
+  var json = JSON.stringify(result);
+  var callback = e.parameter.callback;
+
+  var output;
+  if (callback) {
+    output = ContentService
+      .createTextOutput(callback + '(' + json + ')')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  } else {
+    output = ContentService
+      .createTextOutput(json)
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  return output;
+}
+
+function doOptions(e) {
   return ContentService
-    .createTextOutput(JSON.stringify(result))
-    .setMimeType(ContentService.MimeType.JSON);
+    .createTextOutput('')
+    .setMimeType(ContentService.MimeType.TEXT);
 }`;
 
 // ============ 로딩/화면 제어 ============
@@ -2263,7 +6364,6 @@ function startAutoSync() {
 }
 
 init();
-
 </script>
 </body>
 </html>
