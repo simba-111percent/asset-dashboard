@@ -5795,9 +5795,9 @@ function deleteSwItem() {
 
 // ============ Google Sheets 고정 URL ============
 const SHEET_URLS = {
-  hw:    'https://script.google.com/macros/s/AKfycbzHrOKai_eqng5PyE5xrHi1t1laX_3fbdv5rkrPnu97lf5CKw_xCAP2HsGEb7-LJnMM/exec',
+  hw:    'https://script.google.com/macros/s/AKfycbyf0TFe9ZQEM11-koNYb0Ww4NqteSKzx5uYZlU9ILF_idfp1Oi_9XeB33Ngip9oAxpQVA/exec',
   sw:    'https://script.google.com/macros/s/AKfycbz5KeEuUkCNS9NvQ-cInLnT3L3_X5Lw2Q6UAIeePBXZZXU5GUHh_XUVv5UG5AYVqNDw/exec',
-  seats: 'https://script.google.com/macros/s/AKfycby_53FOoJu9Gul4AO52z-TkJNUw5vIx7adW_Q438ew-4yJP7dz71mk89VCPXy3Hc9aixA/exec'
+  seats: 'https://script.google.com/macros/s/AKfycbzLvP1YzUTUEtOIpsiqPVG_tm10SVOaDboGxOjOBfDUfOUNLAC1HD4YOefRFrV1M06WqA/exec'
 };
 
 // ============ Google Sheets Sync (3개 시트) ============
@@ -5887,8 +5887,9 @@ function parseHwSheetData(sheetData) {
 
   Object.entries(tabMap).forEach(([tabName, cfg]) => {
     if (!tabName || !cfg) return;
-    const rows = sheetData[tabName];
-    if (!rows || !Array.isArray(rows)) return;
+    const rowsRaw = sheetData[tabName];
+    const rows = Array.isArray(rowsRaw) ? rowsRaw : (rowsRaw && Array.isArray(rowsRaw.values)) ? rowsRaw.values : null;
+    if (!rows) return;
 
     for (let i = cfg.headerRow; i < rows.length; i++) {
       const r = rows[i];
@@ -6226,8 +6227,9 @@ async function pullFromSheet(silent = false) {
       const sheetObj = data.assets ? null : data;
       const target = sheetObj || {};
 
-      Object.entries(target).forEach(([sheetName, rows]) => {
-        if (!Array.isArray(rows)) return;
+      Object.entries(target).forEach(([sheetName, rowsRaw]) => {
+        const rows = Array.isArray(rowsRaw) ? rowsRaw : (rowsRaw && Array.isArray(rowsRaw.values)) ? rowsRaw.values : null;
+        if (!rows) return;
         rows.forEach(r => {
           if (!Array.isArray(r)) return;
           r.forEach(cell => {
