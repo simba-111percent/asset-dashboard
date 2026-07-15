@@ -1116,7 +1116,7 @@ function deleteSwItem() {
 // ============ Google Sheets 고정 URL ============
 const SHEET_URLS = {
   hw:    'https://script.google.com/macros/s/AKfycbzHrOKai_eqng5PyE5xrHi1t1laX_3fbdv5rkrPnu97lf5CKw_xCAP2HsGEb7-LJnMM/exec',
-  sw:    'https://script.google.com/macros/s/AKfycbwgkMtIaoJM6m8cziYaUqe7iAA2y-mEl3Dj9jhnU1qJUv0UbuYnsN_WX9zmzkkzW8XC/exec',
+  sw:    'https://script.google.com/macros/s/AKfycbz5KeEuUkCNS9NvQ-cInLnT3L3_X5Lw2Q6UAIeePBXZZXU5GUHh_XUVv5UG5AYVqNDw/exec',
   seats: 'https://script.google.com/macros/s/AKfycby_53FOoJu9Gul4AO52z-TkJNUw5vIx7adW_Q438ew-4yJP7dz71mk89VCPXy3Hc9aixA/exec'
 };
 
