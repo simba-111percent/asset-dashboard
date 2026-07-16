@@ -634,8 +634,16 @@ let swPage = 1;
 const SW_PAGE_SIZE = 30;
 
 function loadSw() {
-  // 최초 로드 시 임시 표시용 (구글시트 실시간 pull 전까지). pullFromSheet()에서 실제 데이터로 교체됨
+  // 최초 로드 시 임시 표시용 (구글시트 실시간 pull 전까지).
+  // `SEED_SW`에는 legacy한 `price` 필드가 쓰여있을 수 있으므로
+  // 현재 코드에서 사용하는 `priceRaw`로 정규화하고 `currency` 기본값을 보장함.
   swList = typeof SEED_SW !== 'undefined' ? JSON.parse(JSON.stringify(SEED_SW)) : [];
+  swList = swList.map(s => {
+    const out = { ...s };
+    if (out.priceRaw === undefined) out.priceRaw = (out.price !== undefined ? out.price : null);
+    if (!out.currency) out.currency = 'KRW';
+    return out;
+  });
 }
 
 function formatPrice(amount, currency) {
