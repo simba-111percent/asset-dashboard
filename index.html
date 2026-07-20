@@ -6117,8 +6117,8 @@ function fetchSheet(url) {
     const script = document.createElement('script');
     const timeoutId = setTimeout(() => {
       cleanup();
-      reject(new Error('요청 타임아웃 (15초)'));
-    }, 15000);
+      reject(new Error('요청 타임아웃 (30초)'));
+    }, 30000);
 
     function cleanup() {
       clearTimeout(timeoutId);
