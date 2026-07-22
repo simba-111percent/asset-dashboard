@@ -77,7 +77,7 @@ function yearsSince(dateStr) {
 }
 
 function isReplaceCandidate(a) {
-  if (a.status === '불용자산') return false;
+  if (a.status === '불용') return false;
   // 사용중인 자산만 교체 대상 (재고는 별도 재고 현황으로)
   if (a.status !== '사용중') return false;
   // 사용자 없으면 교체 대상 제외
@@ -110,7 +110,7 @@ function statusBadgeClass(status) {
   if (status === '사용중') return 'b-used';
   if (status === '재고') return 'b-stock';
   if (status === '미확인') return 'b-unknown';
-  if (status === '불용자산') return 'b-disposed';
+  if (status === '불용') return 'b-disposed';
   return 'b-cat';
 }
 
@@ -121,7 +121,7 @@ function escapeHtml(s) {
 
 // ============ Dashboard ============
 function renderDashboard() {
-  const active = assets.filter(a => a.status !== '불용자산');
+  const active = assets.filter(a => a.status !== '불용');
   const used = active.filter(a => a.status === '사용중');
   const stock = active.filter(a => a.status === '재고');
   const unknown = active.filter(a => a.status === '미확인');
