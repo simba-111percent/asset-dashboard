@@ -1166,7 +1166,7 @@ function parseHwSheetData(sheetData) {
     [findTab(['데스크탑', 'DESKTOP'])]: { headerRow: 7, hasMain: true },
     [findTab(['MAC'])]:                  { headerRow: 7, hasMain: true },
     [findTab(['NT', 'LAPTOP', '노트북'])]: { headerRow: 8, hasMain: true },
-    [findTab(['타블렛', 'TABLET'])]:      { headerRow: 8, hasMain: false },
+    [findTab(['타블렛', 'TABLET', 'OTHER'])]: { headerRow: 8, hasMain: false },
   };
   // null 키 제거
   delete tabMap['null'];
@@ -1182,9 +1182,10 @@ function parseHwSheetData(sheetData) {
   }
 
   function normalizeCategory(tabName, cat) {
-    if (tabName.startsWith('데스크탑')) return 'DESKTOP';
-    if (tabName.startsWith('MAC')) return 'MAC';
-    if (tabName.startsWith('NT')) return 'NOTEBOOK';
+    const t = tabName.toUpperCase();
+    if (t.includes('데스크탑') || t.includes('DESKTOP')) return 'DESKTOP';
+    if (t.includes('MAC')) return 'MAC';
+    if (t.includes('NT') || t.includes('LAPTOP') || t.includes('노트북')) return 'NOTEBOOK';
     const c = String(cat || '').trim();
     if (c === '모바일기기') return 'MOBILE';
     if (c === '타블렛') return 'TABLET';
