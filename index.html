@@ -453,7 +453,6 @@ tbody tr:last-child td { border-bottom: none; }
           <option value="재고">재고</option>
           <option value="미확인">미확인</option>
           <option value="불용">불용</option>
-          <option value="위치미확인">재고·위치미확인</option>
         </select>
         <div class="spacer"></div>
         <button class="btn btn-sm" onclick="exportCSV()">⬇ CSV 내보내기</button>
@@ -4948,11 +4947,7 @@ function getFilteredAssets() {
     }
     if (catF && a.cat !== catF) return false;
     if (corpF && a.corp !== corpF) return false;
-    if (statusFilter === '위치미확인') {
-      if (a.status !== '재고' || (a.loc && a.loc.trim() !== '')) return false;
-    } else if (statusFilter && a.status !== statusFilter) {
-      return false;
-    }
+    if (statusFilter && a.status !== statusFilter) return false;
     return true;
   });
 }

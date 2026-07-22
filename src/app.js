@@ -268,11 +268,7 @@ function getFilteredAssets() {
     }
     if (catF && a.cat !== catF) return false;
     if (corpF && a.corp !== corpF) return false;
-    if (statusFilter === '위치미확인') {
-      if (a.status !== '재고' || (a.loc && a.loc.trim() !== '')) return false;
-    } else if (statusFilter && a.status !== statusFilter) {
-      return false;
-    }
+    if (statusFilter && a.status !== statusFilter) return false;
     return true;
   });
 }
