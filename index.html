@@ -454,6 +454,21 @@ tbody tr:last-child td { border-bottom: none; }
           <option value="미확인">미확인</option>
           <option value="불용">불용</option>
         </select>
+        <select class="select-filter" id="filter-loc" onchange="renderList()">
+          <option value="">전체 위치</option>
+          <option value="12F">12F</option>
+          <option value="11F">11F</option>
+          <option value="10F">10F</option>
+          <option value="9F">9F</option>
+          <option value="8F">8F</option>
+          <option value="7F">7F</option>
+          <option value="6F">6F</option>
+          <option value="5F">5F</option>
+          <option value="4F">4F</option>
+          <option value="3F">3F</option>
+          <option value="3F 창고">3F 창고</option>
+          <option value="B2 창고">B2 창고</option>
+        </select>
         <div class="spacer"></div>
         <button class="btn btn-sm" onclick="exportCSV()">⬇ CSV 내보내기</button>
       </div>
@@ -4939,6 +4954,7 @@ function getFilteredAssets() {
   const q = (document.getElementById('search-input').value || '').trim().toLowerCase();
   const catF = document.getElementById('filter-category').value;
   const corpF = document.getElementById('filter-corp').value;
+  const locF = document.getElementById('filter-loc').value;
 
   return assets.filter(a => {
     if (q) {
@@ -4947,6 +4963,7 @@ function getFilteredAssets() {
     }
     if (catF && a.cat !== catF) return false;
     if (corpF && a.corp !== corpF) return false;
+    if (locF && (a.loc || '').trim() !== locF) return false;
     if (statusFilter && a.status !== statusFilter) return false;
     return true;
   });

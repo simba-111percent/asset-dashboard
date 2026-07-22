@@ -260,6 +260,7 @@ function getFilteredAssets() {
   const q = (document.getElementById('search-input').value || '').trim().toLowerCase();
   const catF = document.getElementById('filter-category').value;
   const corpF = document.getElementById('filter-corp').value;
+  const locF = document.getElementById('filter-loc').value;
 
   return assets.filter(a => {
     if (q) {
@@ -268,6 +269,7 @@ function getFilteredAssets() {
     }
     if (catF && a.cat !== catF) return false;
     if (corpF && a.corp !== corpF) return false;
+    if (locF && (a.loc || '').trim() !== locF) return false;
     if (statusFilter && a.status !== statusFilter) return false;
     return true;
   });
