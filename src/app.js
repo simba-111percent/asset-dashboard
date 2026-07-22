@@ -318,7 +318,7 @@ function renderList() {
         <td>${loc}</td>
         <td style="color:var(--text-muted); font-size:11.5px;">${escapeHtml(spec) || '—'}</td>
         <td style="white-space:nowrap;">${escapeHtml(a.acqDate) || '—'}</td>
-        <td>${fmtMoney(a.residual)}</td>
+        <td style="color:var(--text-muted); font-size:12px;">${escapeHtml(a.acctNo) || '—'}</td>
       </tr>`;
     }).join('');
   }
@@ -1218,7 +1218,7 @@ function parseHwSheetData(sheetData) {
     const rows = Array.isArray(rowsRaw) ? rowsRaw : (rowsRaw && Array.isArray(rowsRaw.values)) ? rowsRaw.values : null;
     if (!rows) return;
 
-    for (let i = cfg.headerRow; i < rows.length; i++) {
+    for (let i = cfg.headerRow + 1; i < rows.length; i++) {
       const r = rows[i];
       if (!r || !r.some(c => c !== null && c !== undefined && c !== '')) continue;
 
@@ -1237,6 +1237,7 @@ function parseHwSheetData(sheetData) {
       const ssd      = cv(r[11 + m]);
       const hdd      = cv(r[12 + m]);
       const gpu      = cv(r[13 + m]);
+      const acctNo   = cv(r[14 + m]);
       const acqYear  = cv(r[15 + m]);
       const acqDate  = cd(r[16 + m]);
       const price    = parseFloat(cv(r[17 + m])) || 0;
@@ -1246,6 +1247,7 @@ function parseHwSheetData(sheetData) {
       if (!name && !category) continue;
       if (!status) continue;
 
+      const t = tabName.toUpperCase();
       result.push({
         id: `a${aid++}`,
         no: (no === '-' || no === '') ? '' : no,
@@ -1256,8 +1258,9 @@ function parseHwSheetData(sheetData) {
         user: (user === '-' || user === '') ? '' : user,
         prevUser: prevUser === '-' ? '' : prevUser,
         loc: location,
-        os: tabName.startsWith('MAC') ? 'macOS' : (tabName.startsWith('데스크탑') || tabName.startsWith('NT') ? 'Windows' : ''),
+        os: t.includes('MAC') ? 'macOS' : ((t.includes('데스크탑') || t.includes('DESKTOP') || t.includes('NT') || t.includes('LAPTOP') || t.includes('노트북')) ? 'Windows' : ''),
         cpu, ram, ssd, hdd, gpu,
+        acctNo: (acctNo === '-' || acctNo === '') ? '' : acctNo,
         corp,
         acqDate,
         acqYear,
