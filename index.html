@@ -447,16 +447,16 @@ tbody tr:last-child td { border-bottom: none; }
         <select class="select-filter" id="filter-corp" onchange="renderList()">
           <option value="">전체 법인</option>
         </select>
+        <select class="select-filter" id="filter-hw-status" onchange="setStatusFilter(this.value)">
+          <option value="">전체 상태</option>
+          <option value="사용중">사용중</option>
+          <option value="재고">재고</option>
+          <option value="미확인">미확인</option>
+          <option value="불용자산">불용자산</option>
+          <option value="위치미확인">재고·위치미확인</option>
+        </select>
         <div class="spacer"></div>
         <button class="btn btn-sm" onclick="exportCSV()">⬇ CSV 내보내기</button>
-      </div>
-
-      <div class="chip-row" style="margin-bottom: 1rem;">
-        <button class="chip on" data-status="" onclick="setStatusFilter('')">전체</button>
-        <button class="chip" data-status="사용중" onclick="setStatusFilter('사용중')">사용중</button>
-        <button class="chip" data-status="재고" onclick="setStatusFilter('재고')">재고</button>
-        <button class="chip" data-status="미확인" onclick="setStatusFilter('미확인')">미확인</button>
-        <button class="chip" data-status="위치미확인" onclick="setStatusFilter('위치미확인')">재고·위치미확인</button>
       </div>
 
       <div class="table-card">
@@ -4932,9 +4932,6 @@ function populateCorpFilter() {
 
 function setStatusFilter(status) {
   statusFilter = status;
-  document.querySelectorAll('.chip[data-status]').forEach(c => {
-    c.classList.toggle('on', c.dataset.status === status);
-  });
   curPage = 1;
   renderList();
 }

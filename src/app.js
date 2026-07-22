@@ -252,9 +252,6 @@ function populateCorpFilter() {
 
 function setStatusFilter(status) {
   statusFilter = status;
-  document.querySelectorAll('.chip[data-status]').forEach(c => {
-    c.classList.toggle('on', c.dataset.status === status);
-  });
   curPage = 1;
   renderList();
 }
