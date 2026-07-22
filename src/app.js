@@ -125,7 +125,6 @@ function renderDashboard() {
   const used = active.filter(a => a.status === '사용중');
   const stock = active.filter(a => a.status === '재고');
   const unknown = active.filter(a => a.status === '미확인');
-  const replaceCands = active.filter(isReplaceCandidate);
   const stockNoLoc = stock.filter(a => !a.loc || a.loc.trim() === '');
 
   document.getElementById('st-total').textContent = active.length.toLocaleString();
@@ -133,7 +132,6 @@ function renderDashboard() {
   document.getElementById('st-stock').textContent = stock.length.toLocaleString();
   document.getElementById('st-stock-loc').textContent = `위치 미확인 ${stockNoLoc.length}건 포함`;
   document.getElementById('st-unknown').textContent = unknown.length.toLocaleString();
-  document.getElementById('st-replace').textContent = replaceCands.length.toLocaleString();
 
   const now = new Date();
   document.getElementById('dash-updated').textContent =

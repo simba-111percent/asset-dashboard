@@ -320,9 +320,11 @@ tbody tr:last-child td { border-bottom: none; }
       <button class="nav-item" data-view="list" onclick="switchView('list')">
         <span class="nav-icon">☰</span> 자산 목록
       </button>
+      <!-- 교체 대상 메뉴 비활성화 (취득일자로 연식 확인 가능 + 회사 정책상 연식만으로 자동 교체하지 않음, 2026-07-20)
       <button class="nav-item" data-view="replace" onclick="switchView('replace')">
         <span class="nav-icon">⚠</span> 교체 대상
       </button>
+      -->
       <button class="nav-item" data-view="stock" onclick="switchView('stock')">
         <span class="nav-icon">📦</span> 재고 현황
       </button>
@@ -388,11 +390,6 @@ tbody tr:last-child td { border-bottom: none; }
           <div class="stat-label">미확인</div>
           <div class="stat-value warn" id="st-unknown">—</div>
           <div class="stat-foot">실사 필요</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">교체 대상</div>
-          <div class="stat-value danger" id="st-replace">—</div>
-          <div class="stat-foot">사용중 · 5년 초과/잔존가 0</div>
         </div>
       </div>
 
@@ -503,7 +500,7 @@ tbody tr:last-child td { border-bottom: none; }
       </div>
     </section>
 
-    <!-- ============ REPLACE CANDIDATES VIEW ============ -->
+    <!-- ============ REPLACE CANDIDATES VIEW (비활성화, 2026-07-20) ============
     <section class="view" id="view-replace">
       <div class="page-hd">
         <div>
@@ -513,6 +510,7 @@ tbody tr:last-child td { border-bottom: none; }
       </div>
       <div class="replace-list" id="replace-list"></div>
     </section>
+    -->
 
     <!-- ============ STOCK VIEW ============ -->
     <section class="view" id="view-stock">
@@ -4819,7 +4817,6 @@ function renderDashboard() {
   const used = active.filter(a => a.status === '사용중');
   const stock = active.filter(a => a.status === '재고');
   const unknown = active.filter(a => a.status === '미확인');
-  const replaceCands = active.filter(isReplaceCandidate);
   const stockNoLoc = stock.filter(a => !a.loc || a.loc.trim() === '');
 
   document.getElementById('st-total').textContent = active.length.toLocaleString();
@@ -4827,7 +4824,6 @@ function renderDashboard() {
   document.getElementById('st-stock').textContent = stock.length.toLocaleString();
   document.getElementById('st-stock-loc').textContent = `위치 미확인 ${stockNoLoc.length}건 포함`;
   document.getElementById('st-unknown').textContent = unknown.length.toLocaleString();
-  document.getElementById('st-replace').textContent = replaceCands.length.toLocaleString();
 
   const now = new Date();
   document.getElementById('dash-updated').textContent =
