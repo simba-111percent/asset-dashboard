@@ -1156,16 +1156,17 @@ function parseHwSheetData(sheetData) {
   // 실제 시트의 탭 이름을 먼저 확인해서 유연하게 매칭
   const allTabs = Object.keys(sheetData);
 
-  // 탭명 유연 매칭 (날짜 부분이 바뀌어도 동작)
-  function findTab(keyword) {
-    return allTabs.find(t => t.includes(keyword)) || null;
+  // 탭명 유연 매칭 (날짜 부분이나 한글/영문 표기가 바뀌어도 동작하도록 후보 키워드 여러 개 허용)
+  function findTab(keywords) {
+    const list = Array.isArray(keywords) ? keywords : [keywords];
+    return allTabs.find(t => list.some(k => t.toUpperCase().includes(k.toUpperCase()))) || null;
   }
 
   const tabMap = {
-    [findTab('데스크탑')]: { headerRow: 7, hasMain: true },
-    [findTab('MAC')]:      { headerRow: 7, hasMain: true },
-    [findTab('NT')]:       { headerRow: 8, hasMain: true },
-    [findTab('타블렛')]:   { headerRow: 8, hasMain: false },
+    [findTab(['데스크탑', 'DESKTOP'])]: { headerRow: 7, hasMain: true },
+    [findTab(['MAC'])]:                  { headerRow: 7, hasMain: true },
+    [findTab(['NT', 'LAPTOP', '노트북'])]: { headerRow: 8, hasMain: true },
+    [findTab(['타블렛', 'TABLET'])]:      { headerRow: 8, hasMain: false },
   };
   // null 키 제거
   delete tabMap['null'];
