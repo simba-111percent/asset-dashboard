@@ -5955,6 +5955,9 @@ function parseHwSheetData(sheetData) {
 }
 
 function parseSwSheetData(sheetData) {
+  // 개인 알림 대상에서 제외할 구분 (전사 공통/계약 단위로 총무가 관리, 2026-07-22 확정)
+  const PERSONAL_ALERT_EXCLUDED_CATS = ['공통 SaaS', '영구라이선스', 'JetBrains', 'Adobe', 'Unity', 'MS'];
+
   // 단순화된 마스터 탭 구성 (각 행 = 사용자별 라이선스)
   const MASTER_CONFIG = {
     tabName: 'rowdata',
@@ -6091,6 +6094,8 @@ function parseSwSheetData(sheetData) {
     let alertType = 'admin';
     if (form === 'Perpetual' || /lifetime/i.test(expireDate)) {
       alertType = 'none'; // 영구라이선스는 알림 대상 아님
+    } else if (PERSONAL_ALERT_EXCLUDED_CATS.includes(cat)) {
+      alertType = 'admin'; // 전사 공통/계약 단위 항목은 개인 알림 대상 아님 (총무가 관리)
     } else if (user) {
       alertType = 'personal'; // 사용자 지정되면 개인 알림
     }
